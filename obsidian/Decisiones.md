@@ -1,6 +1,6 @@
 ---
 tipo: decisiones
-actualizado: 2026-11-13
+actualizado: 2026-11-14
 ---
 
 # Decisiones y reglas de negocio
@@ -41,6 +41,21 @@ actualizado: 2026-11-13
 - Stock: `CHECK (stock >= 0)` y alta del pedido + descuento en un mismo batch de D1. Probado con pedidos simultáneos.
 - Precios: siempre se leen de la base al crear el pedido; nombre y precio se copian en cada ítem.
 - Montos en pesos enteros; fechas en milisegundos UTC, mostradas en hora argentina.
+
+## Confirmadas por el usuario (pedido 5, mejoras UX/UI)
+- **Fuente de títulos: Fraunces 600** (con `next/font`, se sirve como archivo estático). El texto sigue con la fuente del sistema.
+- **"Recordar mis datos en este celular" viene marcado**: nombre, teléfono, entrega y dirección quedan solo en el navegador del cliente.
+- **Textos al cliente**: "Te escribimos por WhatsApp cuando esté listo" y "Listo para retirar / enviar" (asumen que el local le escribe).
+
+## Tomadas en el pedido 5 (corregibles)
+- **La confirmación vive en `/pedido/<token>?nuevo=1`**: `crearPedido` redirige ahí. La URL no se pierde al recargar. Ese link muestra pasos (Recibido → Listo → Entregado) y se refresca cada 45 s.
+- **Stock en el admin optimista y por diferencia**: los +/− se ven al instante y viajan como delta (si entra un pedido al mismo tiempo, no se pisa). El campo se guarda al salir de él.
+- **Orden de sabores y productos con botones ↑/↓** (ya no con un número a mano).
+- **La elección del cliente** sobrevive a una recarga (sessionStorage); si el stock bajó, se recorta y se avisa qué cambió.
+- **Archivar y quitar foto piden un segundo toque**, como Cancelar.
+- **Mensajes de WhatsApp al cliente según el estado** del pedido (recibido, listo, entregado, cancelado).
+- **Pedidos nuevos**: número en la pestaña "(2) Pedidos" y en la barra; las tarjetas nuevas desde la última visita se marcan. Sin sonido.
+- **Avisos flotantes** que se van solos; al marcar Preparado/Entregado traen "Deshacer".
 
 ## Abiertas (ver [[Pendientes]])
 - Clave definitiva del admin.

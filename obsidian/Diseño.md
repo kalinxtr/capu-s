@@ -1,6 +1,6 @@
 ---
 tipo: diseño
-actualizado: 2026-11-13
+actualizado: 2026-11-14
 ---
 
 # Diseño v1
@@ -59,5 +59,5 @@ Next.js 16 + Server Actions en Cloudflare Workers (OpenNext), D1 (SQLite) con Dr
 ## Entornos
 - Prueba: Worker `la-paleteria` en `la-paleteria.lavadito.workers.dev`, D1 `la-paleteria`, R2 `la-paleteria-imagenes`.
 
-## Queda para quien construye
-Estilos, textos finales, orden visual.
+## Estilo (pedido 5)
+Tokens, colores con su contraste, tipografía y espacios: [[Plan UX-UI]] §3. Resumen: fondo crema, tinta chocolate, acento frambuesa `#c2255c` (`#f06595` en oscuro); estados como chips de fondo suave; títulos en Fraunces 600, texto en la fuente del sistema; toques de 44 px; todo en `app/globals.css`, sin librerías.

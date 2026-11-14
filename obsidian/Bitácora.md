@@ -1,6 +1,6 @@
 ---
 tipo: bitacora
-actualizado: 2026-11-13
+actualizado: 2026-11-14
 ---
 
 # Bitácora
@@ -20,3 +20,20 @@ actualizado: 2026-11-13
   - Problema encontrado: la foto como archivo no llegaba a la Server Action dentro del Worker → se manda en base64. Ver [[Stack]].
   - Publicado en https://la-paleteria.lavadito.workers.dev. Secretos cargados (clave de prueba = la de `.dev.vars`). Se borraron los datos que dejó la prueba de humo: la base quedó con los 6 sabores, sin productos ni pedidos.
   - No se probó a mano en un navegador (la extensión de Chrome no estaba conectada); se vio la página pública con capturas de Edge sin ventana.
+
+## Sesión 2: 2026-11-14
+- Pedido 5: revisión UX/UI de todo el frontend → [[Reporte UX-UI]] (46 hallazgos, P0/P1/P2). Un agente armó [[Plan UX-UI]] (10 fases). El usuario eligió Fraunces, "recordar datos" marcado y los textos propuestos.
+- Git: commit de la v1 en `main` y rama `ux-ui` con commits por fase.
+- Lógica pura nueva en `lib/` (`mensajes.ts`, `eleccion.ts`, `stock.ts`, más funciones en `formato.ts` y `pedido.ts`) con 28 pruebas nuevas: 40 en total.
+- Público: hoja del pedido como `<dialog>` nativo (`app/HojaPedido.tsx`), errores que enfocan el campo, elección guardada y recortes avisados, datos del cliente recordados, barra de sabores que marca el sabor visible, "¡Últimas N!", agotado legible, encabezado con logo y Fraunces.
+- `crearPedido` redirige a `/pedido/<token>?nuevo=1`: confirmación con URL estable, línea de pasos, refresco, WhatsApp al local, "Compartir/Copiar link", 404 propio.
+- Admin: avisos flotantes con "Deshacer", sección activa y cuenta de nuevos, "(N) Pedidos" en la pestaña, marca de nuevos, "hace N min", teléfono con `tel:`, dirección a Maps, mensajes de WhatsApp por estado, resumen "Para preparar". Stock optimista por delta, guardar al salir del campo, "Guardar" solo si hay cambios, ↑/↓, archivar en dos toques, resumen arriba.
+- Tokens de color con contraste AA en claro y oscuro, escala de tipo y espacios, movimiento reducido. `error.tsx`, `not-found.tsx`, `loading.tsx` del admin, íconos e imagen para compartir en `public/` (generados con Edge sin ventana).
+- Problemas encontrados y resueltos:
+  - React 19 vacía los formularios con `action` al terminar: un error del servidor borraba lo escrito. Ahora se envían a mano.
+  - Si la fila desaparecía (archivar, pedido que cambia de lista), el aviso se perdía. Los formularios del admin llaman a la acción directo y el aviso lo muestra el layout.
+  - Dos toques rápidos en "+" de la lista pública sumaban 1. Arreglado.
+  - En el celular la fila de Stock quedaba apilada. Arreglado con filas propias para stock y menú.
+  - Quedaban `wrangler dev` de la sesión 1 en el puerto 8787 que se recargaban con cada build y colgaban la prueba de humo. No se cerraron (no eran de esta sesión): se probó en el 8788.
+- Verificación: 40 pruebas, typecheck, prueba de humo de 29 pasos en verde, Worker de 1,14 MiB comprimido. Recorrido en Edge sin ventana (público, confirmación, 404, ingreso, pedidos, stock; claro y oscuro; 390 y 1100 px), sin errores en consola.
+- Datos de prueba solo en la D1 **local** (productos de ejemplo y pedidos de "Cliente Prueba"/"Ana Prueba"). Nada se publicó.
