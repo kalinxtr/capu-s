@@ -1,21 +1,30 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
+import { LogoPaleta } from "@/app/LogoPaleta";
+import { ajustesActuales } from "@/lib/datos";
 import { haySesion } from "@/lib/sesion";
 import { ingresar } from "../acciones";
-import { FormAccion } from "../componentes";
+import { CampoClave, FormAccion } from "../componentes";
 
-export const metadata = { title: "Admin · La Paletería", robots: { index: false } };
+export const metadata: Metadata = { title: { absolute: "Ingresar · Admin" }, robots: { index: false } };
 
 export default async function Ingresar() {
+  await connection();
   if (await haySesion()) redirect("/admin/pedidos");
+  const ajustes = await ajustesActuales();
   return (
     <main className="admin ingresar">
-      <h1>Admin</h1>
+      <div className="marca">
+        <LogoPaleta />
+        <div>
+          <h1>Admin</h1>
+          <p className="ayuda">{ajustes.nombre_local}</p>
+        </div>
+      </div>
       <FormAccion accion={ingresar} className="tarjeta">
-        <label>
-          Clave
-          <input name="clave" type="password" required autoComplete="current-password" autoFocus />
-        </label>
-        <button className="boton-principal">Entrar</button>
+        <CampoClave />
+        <button className="boton-principal ancho">Entrar</button>
       </FormAccion>
     </main>
   );
