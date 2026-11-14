@@ -1,0 +1,3 @@
+# Copiar a .dev.vars para desarrollo local. En Cloudflare se cargan con `npx wrangler secret put`.
+ADMIN_CLAVE=una-clave-de-prueba
+SESION_SECRETO=al-menos-32-caracteres-al-azar-xxxxxxxx

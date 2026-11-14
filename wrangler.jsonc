@@ -1,0 +1,28 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "la-paleteria",
+	"main": ".open-next/worker.js",
+	"compatibility_date": "2026-11-13",
+	"compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+	"observability": { "enabled": true },
+	"assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
+	"services": [
+		// Auto-referencia que usa OpenNext para su caché. Tiene que coincidir con "name".
+		{ "binding": "WORKER_SELF_REFERENCE", "service": "la-paleteria" }
+	],
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "la-paleteria",
+			"database_id": "4fb85b7f-f9ce-49c2-b55e-8a3d7cc52433",
+			"migrations_dir": "migrations"
+		}
+	],
+	"r2_buckets": [{ "binding": "IMAGENES", "bucket_name": "la-paleteria-imagenes" }],
+	"ratelimits": [
+		// Pedidos públicos por IP y por minuto, para que nadie vacíe el stock con un script.
+		{ "name": "LIMITE_PEDIDOS", "namespace_id": "2001", "simple": { "limit": 5, "period": 60 } },
+		// Intentos de ingreso al admin por IP y por minuto.
+		{ "name": "LIMITE_INGRESO", "namespace_id": "2002", "simple": { "limit": 10, "period": 60 } }
+	]
+}
