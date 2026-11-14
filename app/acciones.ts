@@ -1,21 +1,13 @@
 "use server";
 
 import { refresh } from "next/cache";
+import { redirect } from "next/navigation";
 import { db, env, excedido, ipCliente } from "@/lib/cloudflare";
-import { leerAjustes } from "@/lib/datos";
-import { linkWhatsApp, normalizarTelefono } from "@/lib/formato";
-import { leerPedido, textoPedido } from "@/lib/pedido";
+import { normalizarTelefono } from "@/lib/formato";
+import { leerPedido, type CampoPedido } from "@/lib/pedido";
 
-export type PedidoCreado = {
-  ok: true;
-  id: number;
-  token: string;
-  total: number;
-  items: { nombre: string; cantidad: number; precio: number }[];
-  /** Link para que el cliente le avise al local por WhatsApp (si el local cargó su número). */
-  whatsapp: string | null;
-};
-export type ResultadoPedido = PedidoCreado | { ok: false; error: string } | null;
+/** Solo vuelve algo si falló: si sale bien, redirige al link del pedido (que es la confirmación). */
+export type ResultadoPedido = { ok: false; error: string; campo?: CampoPedido } | null;
 
 const AGOTADO = "Alguna paleta se agotó mientras elegías. Ya actualizamos la lista: revisá y volvé a pedir.";
 
@@ -23,6 +15,7 @@ const AGOTADO = "Alguna paleta se agotó mientras elegías. Ya actualizamos la l
  * Crea el pedido y descuenta el stock en un solo batch de D1 (atómico).
  * Los precios salen de la base, nunca del formulario. Si algún producto quedaría con
  * stock negativo, el CHECK de la tabla hace fallar el batch completo: no queda nada a medias.
+ * Al terminar redirige a `/pedido/<token>?nuevo=1`: la confirmación tiene una URL que no se pierde.
  */
 export async function crearPedido(_prev: ResultadoPedido, form: FormData): Promise<ResultadoPedido> {
   const leido = leerPedido(form.entries());
@@ -62,12 +55,11 @@ export async function crearPedido(_prev: ResultadoPedido, form: FormData): Promi
   const token = crypto.randomUUID();
   const ahora = Date.now();
 
-  let id: number;
   try {
-    const res = await DB.batch([
+    await DB.batch([
       DB.prepare(
         `INSERT INTO pedidos (token, cliente_nombre, cliente_telefono, entrega, direccion, nota, total, estado, creado, actualizado)
-         VALUES (?, ?, ?, ?, ?, ?, ?, 'nuevo', ?, ?) RETURNING id`,
+         VALUES (?, ?, ?, ?, ?, ?, ?, 'nuevo', ?, ?)`,
       ).bind(token, d.nombre, normalizarTelefono(d.telefono), d.entrega, d.direccion, d.nota, total, ahora, ahora),
       ...items.flatMap((i) => [
         DB.prepare("UPDATE productos SET stock = stock - ? WHERE id = ?").bind(i.cantidad, i.productoId),
@@ -77,7 +69,6 @@ export async function crearPedido(_prev: ResultadoPedido, form: FormData): Promi
         ).bind(i.productoId, i.nombre, i.precio, i.cantidad, token),
       ]),
     ]);
-    id = (res[0].results[0] as { id: number }).id;
   } catch (e) {
     if (/CHECK constraint failed/i.test(mensajeDe(e))) {
       refresh();
@@ -86,17 +77,9 @@ export async function crearPedido(_prev: ResultadoPedido, form: FormData): Promi
     throw e;
   }
 
+  // Fuera del try: redirect() funciona tirando una excepción especial.
   refresh();
-  const ajustes = await leerAjustes(DB);
-  const texto = textoPedido({ id, cliente_nombre: d.nombre, entrega: d.entrega, direccion: d.direccion, nota: d.nota, total, items });
-  return {
-    ok: true,
-    id,
-    token,
-    total,
-    items: items.map(({ nombre, cantidad, precio }) => ({ nombre, cantidad, precio })),
-    whatsapp: ajustes.whatsapp ? linkWhatsApp(ajustes.whatsapp, `Hola! Hice este pedido:\n${texto}`) : null,
-  };
+  redirect(`/pedido/${token}?nuevo=1`);
 }
 
 function mensajeDe(e: unknown): string {

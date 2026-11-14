@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { db, env, excedido, ipCliente } from "@/lib/cloudflare";
 import { parsePesos, telefonoValido } from "@/lib/formato";
 import { cerrarSesion, claveCorrecta, exigirSesion, iniciarSesion } from "@/lib/sesion";
+import { moverEnLista } from "@/lib/stock";
 import { ESTADOS, type EstadoPedido, type Resultado } from "@/lib/tipos";
 
 // ───────────────────────── Sesión ─────────────────────────
@@ -77,7 +78,8 @@ export async function cambiarEstado(_prev: Resultado, form: FormData): Promise<R
     .bind(estado, ahora, id)
     .run();
   refresh();
-  return r.meta.changes ? ok() : error("Un pedido cancelado no se puede reabrir.");
+  const mensaje = { nuevo: `Pedido #${id} volvió a nuevo.`, preparado: `Pedido #${id} listo.`, entregado: `Pedido #${id} entregado.` }[estado];
+  return r.meta.changes ? ok(mensaje) : error("Un pedido cancelado no se puede reabrir.");
 }
 
 // ───────────────────────── Sabores ─────────────────────────
@@ -94,15 +96,40 @@ export async function crearSabor(_prev: Resultado, form: FormData): Promise<Resu
   return ok(`Sabor "${nombre}" agregado.`);
 }
 
+/** Renombra un sabor. El orden se cambia con moverSabor. */
 export async function editarSabor(_prev: Resultado, form: FormData): Promise<Resultado> {
   await exigirSesion();
   const id = entero(form, "id", 1);
   const nombre = texto(form, "nombre", 40);
-  const orden = entero(form, "orden", 0, 9999);
-  if (!id || nombre.length < 2 || orden === null) return error("Revisá el nombre y el orden.");
-  await (await db()).prepare("UPDATE sabores SET nombre = ?, orden = ? WHERE id = ?").bind(nombre, orden, id).run();
+  if (!id || nombre.length < 2) return error("Escribí el nombre del sabor.");
+  await (await db()).prepare("UPDATE sabores SET nombre = ? WHERE id = ?").bind(nombre, id).run();
   refresh();
-  return ok("Guardado.");
+  return ok("Sabor guardado.");
+}
+
+function direccion(form: FormData): "arriba" | "abajo" | null {
+  const d = String(form.get("dir"));
+  return d === "arriba" || d === "abajo" ? d : null;
+}
+
+/** Renumera el orden 1..n con el elemento movido (así también se arreglan empates viejos). */
+async function reordenar(DB: D1Database, tabla: "sabores" | "productos", ids: number[], id: number, dir: "arriba" | "abajo") {
+  const nuevo = moverEnLista(ids, id, dir);
+  if (!nuevo) return;
+  await DB.batch(nuevo.map((x, i) => DB.prepare(`UPDATE ${tabla} SET orden = ? WHERE id = ?`).bind(i + 1, x)));
+}
+
+/** Sube o baja un sabor un lugar en la página pública. */
+export async function moverSabor(_prev: Resultado, form: FormData): Promise<Resultado> {
+  await exigirSesion();
+  const id = entero(form, "id", 1);
+  const dir = direccion(form);
+  if (!id || !dir) return error("Movimiento inválido.");
+  const DB = await db();
+  const { results } = await DB.prepare("SELECT id FROM sabores WHERE activo = 1 ORDER BY orden, id").all<{ id: number }>();
+  await reordenar(DB, "sabores", results.map((r) => r.id), id, dir);
+  refresh();
+  return ok();
 }
 
 /** Archivar o reactivar: nunca se borra (los pedidos viejos lo nombran). */
@@ -113,7 +140,7 @@ export async function activarSabor(_prev: Resultado, form: FormData): Promise<Re
   if (!id || activo === null) return error("Sabor inválido.");
   await (await db()).prepare("UPDATE sabores SET activo = ? WHERE id = ?").bind(activo, id).run();
   refresh();
-  return ok();
+  return ok(activo ? "Sabor reactivado." : "Sabor archivado. Lo encontrás en Archivados.");
 }
 
 // ───────────────────────── Productos ─────────────────────────
@@ -145,7 +172,25 @@ export async function editarProducto(_prev: Resultado, form: FormData): Promise<
   if (!id || nombre.length < 2 || precio === null) return error("Revisá el nombre y el precio.");
   await (await db()).prepare("UPDATE productos SET nombre = ?, precio = ? WHERE id = ?").bind(nombre, precio, id).run();
   refresh();
-  return ok("Guardado.");
+  return ok(`"${nombre}" guardado.`);
+}
+
+/** Sube o baja un producto un lugar dentro de su sabor. */
+export async function moverProducto(_prev: Resultado, form: FormData): Promise<Resultado> {
+  await exigirSesion();
+  const id = entero(form, "id", 1);
+  const dir = direccion(form);
+  if (!id || !dir) return error("Movimiento inválido.");
+  const DB = await db();
+  const { results } = await DB.prepare(
+    `SELECT id FROM productos WHERE activo = 1
+       AND sabor_id = (SELECT sabor_id FROM productos WHERE id = ?) ORDER BY orden, id`,
+  )
+    .bind(id)
+    .all<{ id: number }>();
+  await reordenar(DB, "productos", results.map((r) => r.id), id, dir);
+  refresh();
+  return ok();
 }
 
 /** Suma o resta stock (botones + y −). Nunca baja de 0. */
@@ -177,7 +222,7 @@ export async function activarProducto(_prev: Resultado, form: FormData): Promise
   if (!id || activo === null) return error("Producto inválido.");
   await (await db()).prepare("UPDATE productos SET activo = ? WHERE id = ?").bind(activo, id).run();
   refresh();
-  return ok();
+  return ok(activo ? "Producto reactivado." : "Producto archivado. Lo encontrás en Archivados.");
 }
 
 const TIPOS_FOTO: Record<string, string> = { "image/webp": "webp", "image/jpeg": "jpg", "image/png": "png" };
