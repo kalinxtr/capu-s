@@ -38,14 +38,22 @@ describe("leerPedido", () => {
     }
   });
 
-  it("exige nombre y teléfono", () => {
-    expect(leerPedido([["telefono", "1123456789"], ["entrega", "retiro"], ["cant_1", "1"]]).ok).toBe(false);
-    expect(leerPedido([["nombre", "Ana"], ["telefono", "123"], ["entrega", "retiro"], ["cant_1", "1"]]).ok).toBe(false);
+  it("exige nombre y teléfono, y dice qué campo falló", () => {
+    expect(leerPedido([["telefono", "1123456789"], ["entrega", "retiro"], ["cant_1", "1"]])).toEqual({
+      ok: false,
+      error: "Escribí tu nombre.",
+      campo: "nombre",
+    });
+    expect(leerPedido([["nombre", "Ana"], ["telefono", "123"], ["entrega", "retiro"], ["cant_1", "1"]])).toEqual({
+      ok: false,
+      error: "Revisá el teléfono: con código de área.",
+      campo: "telefono",
+    });
   });
 
   it("con envío exige dirección; con retiro la ignora", () => {
     const envio: [string, string][] = [["nombre", "Ana"], ["telefono", "1123456789"], ["entrega", "envio"], ["cant_1", "1"]];
-    expect(leerPedido(envio)).toEqual({ ok: false, error: "Escribí la dirección de envío." });
+    expect(leerPedido(envio)).toEqual({ ok: false, error: "Escribí la dirección de envío.", campo: "direccion" });
     const ok = leerPedido([...envio, ["direccion", "Calle 123"]]);
     expect(ok.ok && ok.datos.direccion).toBe("Calle 123");
     const retiro = leerPedido([...base, ["direccion", "Calle 123"], ["cant_1", "1"]]);
