@@ -1,6 +1,7 @@
 import "server-only";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { cache } from "react";
 import { env } from "./cloudflare";
 import { firmarSesion, iguales, sesionValida } from "./firma";
 
@@ -39,19 +40,29 @@ export async function cerrarSesion() {
   (await cookies()).delete(COOKIE);
 }
 
-export async function haySesion(): Promise<boolean> {
+/**
+ * Memorizada por request: la metadata, el layout y la página la consultan sin repetir el HMAC.
+ * Ojo: no llamarla antes de `iniciarSesion()`/`cerrarSesion()` en la misma acción, porque
+ * después devolvería el valor viejo.
+ */
+export const haySesion = cache(async (): Promise<boolean> => {
   const valor = (await cookies()).get(COOKIE)?.value;
   if (!valor) return false;
   const { clave, secreto } = await secretos();
   return sesionValida(secreto, clave, valor, Date.now());
-}
+});
 
 /** Para páginas del admin: sin sesión, manda a ingresar. */
 export async function requerirSesion() {
   if (!(await haySesion())) redirect("/admin/ingresar");
 }
 
-/** Para Server Actions del admin: se pueden llamar por POST directo, así que se verifica adentro. */
+/**
+ * Para Server Actions del admin: se pueden llamar por POST directo, así que se verifica adentro.
+ * Sin sesión (venció o cambió la clave) no es un error inesperado: se manda a ingresar.
+ * En una Server Action, `redirect` lo maneja Next (header `x-action-redirect`), también si se
+ * la llama desde una transición del cliente.
+ */
 export async function exigirSesion() {
-  if (!(await haySesion())) throw new Error("Tenés que ingresar al admin.");
+  if (!(await haySesion())) redirect("/admin/ingresar");
 }

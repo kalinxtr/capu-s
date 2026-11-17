@@ -1,6 +1,7 @@
 import { cuentaPedidos } from "@/lib/datos";
 import { requerirSesion } from "@/lib/sesion";
-import { Avisos, NavAdmin } from "../componentes";
+import { Avisos } from "../_componentes/avisos";
+import { NavAdmin } from "../_componentes/nav";
 
 export const metadata = { title: { template: "%s · Admin", default: "Admin" }, robots: { index: false } };
 

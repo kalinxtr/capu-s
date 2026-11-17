@@ -10,7 +10,8 @@ import { requerirSesion } from "@/lib/sesion";
 import { ESTADOS, NOMBRE_ESTADO, type EstadoPedido } from "@/lib/tipos";
 import { Refrescar } from "../../../compartidos";
 import { cambiarEstado } from "../../acciones";
-import { BotonEstado, BotonSeguro, FormAccion, MarcaNueva, RegistrarVistos } from "../../componentes";
+import { BotonSeguro, FormAccion } from "../../_componentes/formularios";
+import { BotonEstado, MarcaNueva, RegistrarVistos } from "../../_componentes/pedidos";
 
 type Filtro = EstadoPedido | "activos" | "todos";
 const FILTROS: Filtro[] = ["activos", ...ESTADOS, "todos"];

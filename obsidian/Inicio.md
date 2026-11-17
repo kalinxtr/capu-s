@@ -1,6 +1,6 @@
 ---
 tipo: indice
-actualizado: 2026-11-14
+actualizado: 2026-11-16
 ---
 
 # La Paletería: notas del proyecto
@@ -17,9 +17,12 @@ App para un negocio de paletas heladas: una **página pública de pedidos** (lis
 7. [[Stack]]: propuesta de tecnologías.
 8. [[Diseño]]: diseño v1 (qué se construye).
 9. [[Reporte UX-UI]] y [[Plan UX-UI]]: mejoras de la sesión 2 (rama `ux-ui`).
+10. [[Auditoría arquitectura frontend]] y [[Plan arquitectura frontend]]: arquitectura del frontend (pedido 7, rama `ux-ui`).
 
 **Estado actual (2026-11-13):** **v1 construida y publicada en un entorno de prueba**: https://la-paleteria.lavadito.workers.dev (admin en `/admin`). Base D1 `la-paleteria` (vacía: solo los 6 sabores), fotos en R2 `la-paleteria-imagenes`. Prueba de humo de 25 pasos en verde, en local y publicada. Falta que el usuario la pruebe y cargue sus productos.
 
 **2026-11-14:** mejoras UX/UI hechas en la rama `ux-ui`, sin publicar todavía (prueba de humo ahora de 29 pasos). Ver [[Pendientes]].
+
+**2026-11-16:** auditoría de arquitectura frontend hecha e implementada en `ux-ui` (sesión vencida → ingresar, `useAccion`, fotos a 320 px, módulos del admin por tema). 50 pruebas, prueba de humo de 30 pasos y recorrido en Chrome en verde. Ver [[Pendientes]].
 
 Comandos, deploy y trampas: `README.md` en la raíz del repo.

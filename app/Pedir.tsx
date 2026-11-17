@@ -1,27 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  CLAVE_ELECCION,
-  leerEleccion,
-  recortarEleccion,
-  textoRecorte,
-  textoStock,
-  type Eleccion,
-  type Recorte,
-} from "@/lib/eleccion";
+import { useMemo, useRef, useState } from "react";
+import { textoRecorte, textoStock } from "@/lib/eleccion";
 import { pesos } from "@/lib/formato";
 import { HojaPedido, type Elegido } from "./HojaPedido";
+import { useEleccion } from "./useEleccion";
+import { useSaborVisible } from "./useSaborVisible";
 
 type ProductoPublico = { id: number; nombre: string; precio: number; stock: number; imagen: string | null };
 type Seccion = { id: number; nombre: string; productos: ProductoPublico[] };
 
 export function Pedir({ secciones, textoRetiro }: { secciones: Seccion[]; textoRetiro: string | null }) {
-  const [cantidades, setCantidades] = useState<Eleccion>({});
   const [abierto, setAbierto] = useState(false);
-  const [recortes, setRecortes] = useState<Recorte[]>([]);
   const [anuncio, setAnuncio] = useState("");
-  const [saborVisible, setSaborVisible] = useState<number | null>(secciones[0]?.id ?? null);
 
   const productos = useMemo(() => secciones.flatMap((s) => s.productos), [secciones]);
   /** "Oreo · Paleta": el nombre solo ("Paleta") se repite entre sabores. */
@@ -29,69 +20,14 @@ export function Pedir({ secciones, textoRetiro }: { secciones: Seccion[]; textoR
     () => new Map(secciones.flatMap((s) => s.productos.map((p) => [p.id, `${s.nombre} · ${p.nombre}`] as const))),
     [secciones],
   );
+  const elegibles = useMemo(
+    () => productos.map((p) => ({ id: p.id, nombre: completo.get(p.id)!, stock: p.stock })),
+    [productos, completo],
+  );
+  const { cantidades, cambiar: cambiarCantidad, recortes, descartarRecortes } = useEleccion(elegibles);
 
-  // La elección se guarda en el navegador (sobrevive a una recarga) y se ajusta al stock cada vez
-  // que la lista se actualiza: si otra persona pidió lo último, se recorta y se avisa.
-  const cargado = useRef(false);
-  const actuales = useRef(cantidades);
-  useEffect(() => {
-    actuales.current = cantidades;
-  }, [cantidades]);
-
-  useEffect(() => {
-    let base = actuales.current;
-    const primera = !cargado.current;
-    if (primera) {
-      cargado.current = true;
-      try {
-        base = leerEleccion(sessionStorage.getItem(CLAVE_ELECCION));
-      } catch {
-        base = {};
-      }
-    }
-    const r = recortarEleccion(
-      base,
-      productos.map((p) => ({ id: p.id, nombre: completo.get(p.id)!, stock: p.stock })),
-    );
-    if (primera || r.cambio) setCantidades(r.eleccion);
-    if (r.recortes.length) setRecortes(r.recortes);
-  }, [productos, completo]);
-
-  const saltarPrimerGuardado = useRef(true);
-  useEffect(() => {
-    if (saltarPrimerGuardado.current) {
-      saltarPrimerGuardado.current = false;
-      return;
-    }
-    try {
-      sessionStorage.setItem(CLAVE_ELECCION, JSON.stringify(cantidades));
-    } catch {
-      // Modo privado sin almacenamiento: la elección vive solo en esta pantalla.
-    }
-  }, [cantidades]);
-
-  // Sabor visible al scrollear: se marca en la barra de sabores.
   const nav = useRef<HTMLElement>(null);
-  useEffect(() => {
-    const obs = new IntersectionObserver(
-      (entradas) => {
-        const visible = entradas.find((e) => e.isIntersecting);
-        if (visible) setSaborVisible(Number(visible.target.getAttribute("data-sabor")));
-      },
-      { rootMargin: "-80px 0px -60% 0px" },
-    );
-    document.querySelectorAll("section[data-sabor]").forEach((s) => obs.observe(s));
-    return () => obs.disconnect();
-  }, [secciones]);
-  useEffect(() => {
-    nav.current
-      ?.querySelector<HTMLElement>(`[data-sabor="${saborVisible}"]`)
-      ?.scrollIntoView({
-        block: "nearest",
-        inline: "center",
-        behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
-      });
-  }, [saborVisible]);
+  const saborVisible = useSaborVisible(secciones, nav);
 
   const elegidos: Elegido[] = productos
     .filter((p) => (cantidades[p.id] ?? 0) > 0)
@@ -99,18 +35,12 @@ export function Pedir({ secciones, textoRetiro }: { secciones: Seccion[]; textoR
   const unidades = elegidos.reduce((t, p) => t + p.cantidad, 0);
   const total = elegidos.reduce((t, p) => t + p.precio * p.cantidad, 0);
 
-  useEffect(() => {
-    if (unidades === 0) setAbierto(false);
-  }, [unidades]);
+  // Sin nada elegido (un recorte lo dejó en 0) la hoja se cierra; su onClose deja `abierto` en false,
+  // así que no se vuelve a abrir sola al elegir otra vez.
+  const hojaAbierta = abierto && unidades > 0;
 
-  // Se lee y actualiza el ref en el momento: dos toques rápidos antes de re-renderizar suman 2, no 1.
   const cambiar = (p: ProductoPublico, delta: number) => {
-    const c = actuales.current;
-    const n = Math.max(0, Math.min(p.stock, (c[p.id] ?? 0) + delta));
-    const { [p.id]: _, ...resto } = c;
-    const nuevo = n ? { ...resto, [p.id]: n } : resto;
-    actuales.current = nuevo;
-    setCantidades(nuevo);
+    const n = cambiarCantidad(p.id, delta);
     setAnuncio(`${n} ${completo.get(p.id)}`);
   };
 
@@ -122,7 +52,7 @@ export function Pedir({ secciones, textoRetiro }: { secciones: Seccion[]; textoR
           <li key={r.id}>{textoRecorte(r)}</li>
         ))}
       </ul>
-      <button type="button" className="link" onClick={() => setRecortes([])}>
+      <button type="button" className="link" onClick={descartarRecortes}>
         Entendido
       </button>
     </div>
@@ -148,7 +78,7 @@ export function Pedir({ secciones, textoRetiro }: { secciones: Seccion[]; textoR
         })}
       </nav>
 
-      {!abierto && avisoRecortes}
+      {!hojaAbierta && avisoRecortes}
 
       {secciones.map((s, si) => (
         <section key={s.id} id={`sabor-${s.id}`} data-sabor={s.id} className="sabor" aria-labelledby={`titulo-sabor-${s.id}`}>
@@ -213,13 +143,13 @@ export function Pedir({ secciones, textoRetiro }: { secciones: Seccion[]; textoR
       )}
 
       <HojaPedido
-        abierto={abierto}
+        abierto={hojaAbierta}
         onCerrar={() => setAbierto(false)}
         elegidos={elegidos}
         unidades={unidades}
         total={total}
         textoRetiro={textoRetiro}
-        aviso={abierto && avisoRecortes}
+        aviso={hojaAbierta && avisoRecortes}
       />
     </>
   );

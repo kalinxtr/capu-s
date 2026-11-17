@@ -67,7 +67,12 @@ const nombre = `Prueba ${Date.now()}`;
 const home = await fetch(base + "/");
 check(home.status === 200, "La página pública carga", `${home.status}`);
 const sinSesion = await accion("crearSabor", "/admin/stock", { nombre: "No debería" });
-check(!sinSesion.ok, "Una acción del admin sin sesión se rechaza", `${sinSesion.status}`);
+check(
+  sinSesion.status === 200 && /\/admin\/ingresar/.test(sinSesion.redirige ?? ""),
+  "Una acción del admin sin sesión manda a ingresar",
+  `${sinSesion.status} ${sinSesion.redirige}`,
+);
+check(!sinSesion.ok, "…y no se ejecuta");
 const admin = await fetch(base + "/admin/pedidos", { redirect: "manual" });
 check([303, 307, 308].includes(admin.status) || /ingresar/.test(await admin.text()), "El admin sin sesión manda a ingresar");
 

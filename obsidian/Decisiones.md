@@ -35,7 +35,7 @@ actualizado: 2026-11-14
 - **Datos del local** (nombre, WhatsApp, indicaciones de retiro) van abajo de todo en Stock, no en una sección aparte (el usuario pidió solo Pedidos y Stock).
 - **Confirmación:** número de pedido, resumen, botón "Avisar por WhatsApp" al local (si cargó su número) y link privado `/pedido/<token>`.
 - **Anti-abuso:** 5 pedidos por minuto por IP y 10 intentos de ingreso por minuto por IP (rate limiter de Workers). Sin Turnstile por ahora.
-- **Fotos:** el navegador las achica a 800 px WebP; viajan como data URL (base64) dentro de la Server Action, porque en el Worker los archivos binarios se pierden. Tope 700 KB. Se sirven desde `/img/<clave>` con caché de un año (la clave cambia si cambia la foto).
+- **Fotos:** el navegador las achica a 320 px WebP de lado mayor (se muestran a 76 px; antes eran 800, pedido 7); viajan como data URL (base64) dentro de la Server Action, porque en el Worker los archivos binarios se pierden. Tope 700 KB. Se sirven desde `/img/<clave>` con caché de un año (la clave cambia si cambia la foto).
 - **Sin Drizzle:** SQL directo sobre D1 y migraciones escritas a mano en `migrations/`. Son pocas consultas y así el Worker pesa menos.
 - `cacheComponents` apagado: cuelga el Worker con OpenNext (ver [[Stack]]).
 - Stock: `CHECK (stock >= 0)` y alta del pedido + descuento en un mismo batch de D1. Probado con pedidos simultáneos.

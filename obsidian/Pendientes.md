@@ -1,6 +1,6 @@
 ---
 tipo: pendientes
-actualizado: 2026-11-14
+actualizado: 2026-11-16
 ---
 
 # Pendientes
@@ -25,6 +25,11 @@ Ver [[Reporte UX-UI]], [[Plan UX-UI]] y [[Bitácora]]. Falta:
 - [ ] **Revisar la rama y decidir si se fusiona a `main`** y se publica. No hay migraciones nuevas: alcanza con `npm run deploy`.
 - [ ] Probarla en un celular de verdad (se probó con Edge sin ventana a 390 px y 1100 px, claro y oscuro).
 - [ ] Pegar el link en WhatsApp después de publicar y ver la vista previa (imagen `public/og.png`).
+
+## 3c. Arquitectura frontend (pedido 7): HECHA en la rama `ux-ui`
+Ver [[Auditoría arquitectura frontend]] y [[Plan arquitectura frontend]]. Falta:
+- [ ] Probarla en un celular de verdad, sobre todo Stock ("+" rápido, subir foto) y una sesión vencida (debe mandar a ingresar).
+- [ ] Menores que quedaron: una foto con base64 de largo inválido termina en "No se pudo guardar…" (antes daba 500); `haySesion()` memorizada no se debe llamar antes de `iniciarSesion()`/`cerrarSesion()` en la misma acción (anotado en `lib/sesion.ts`).
 
 ## 4. Ideas para después (no pedidas)
 - Aviso sonoro de pedido nuevo en el admin (diferido: necesita un interruptor y permiso de audio).

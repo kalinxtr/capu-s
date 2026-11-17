@@ -15,7 +15,9 @@ import {
   moverProducto,
   moverSabor,
 } from "../../acciones";
-import { BotonSeguro, ControlStock, FormAccion, FotoProducto } from "../../componentes";
+import { FotoProducto } from "../../_componentes/foto";
+import { BotonSeguro, FormAccion } from "../../_componentes/formularios";
+import { ControlStock } from "../../_componentes/stock";
 
 export const metadata = { title: "Stock" };
 

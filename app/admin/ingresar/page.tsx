@@ -5,7 +5,8 @@ import { LogoPaleta } from "@/app/LogoPaleta";
 import { ajustesActuales } from "@/lib/datos";
 import { haySesion } from "@/lib/sesion";
 import { ingresar } from "../acciones";
-import { CampoClave, FormAccion } from "../componentes";
+import { FormAccion } from "../_componentes/formularios";
+import { CampoClave } from "../_componentes/ingreso";
 
 export const metadata: Metadata = { title: { absolute: "Ingresar · Admin" }, robots: { index: false } };
 

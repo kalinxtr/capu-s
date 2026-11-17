@@ -3,7 +3,9 @@
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { db, env, excedido, ipCliente } from "@/lib/cloudflare";
+import { entero, texto } from "@/lib/entradas";
 import { parsePesos, telefonoValido } from "@/lib/formato";
+import { leerFotoDataUrl } from "@/lib/foto";
 import { cerrarSesion, claveCorrecta, exigirSesion, iniciarSesion } from "@/lib/sesion";
 import { moverEnLista } from "@/lib/stock";
 import { ESTADOS, type EstadoPedido, type Resultado } from "@/lib/tipos";
@@ -30,17 +32,6 @@ export async function salir() {
 
 const ok = (mensaje?: string): Resultado => ({ ok: true, mensaje });
 const error = (e: string): Resultado => ({ ok: false, error: e });
-
-function entero(form: FormData, campo: string, min = 0, max = 1_000_000): number | null {
-  const v = String(form.get(campo) ?? "").trim();
-  if (!/^-?\d+$/.test(v)) return null;
-  const n = Number(v);
-  return Number.isSafeInteger(n) && n >= min && n <= max ? n : null;
-}
-
-function texto(form: FormData, campo: string, max: number): string {
-  return String(form.get(campo) ?? "").trim().slice(0, max);
-}
 
 // ───────────────────────── Pedidos ─────────────────────────
 
@@ -225,7 +216,6 @@ export async function activarProducto(_prev: Resultado, form: FormData): Promise
   return ok(activo ? "Producto reactivado." : "Producto archivado. Lo encontrás en Archivados.");
 }
 
-const TIPOS_FOTO: Record<string, string> = { "image/webp": "webp", "image/jpeg": "jpg", "image/png": "png" };
 /** El cuerpo de una Server Action tiene 1 MB de tope en Next; en base64 la foto ocupa un 33 % más. */
 const MAX_FOTO = 700 * 1024;
 
@@ -233,13 +223,9 @@ const MAX_FOTO = 700 * 1024;
 export async function subirFoto(_prev: Resultado, form: FormData): Promise<Resultado> {
   await exigirSesion();
   const id = entero(form, "id", 1);
-  // La foto llega como data URL (base64), ya achicada por el navegador. Con OpenNext en Workers,
-  // un archivo binario dentro de una Server Action se pierde al decodificar (ver obsidian/Stack.md).
-  const m = /^data:(image\/(?:webp|jpeg|png));base64,([A-Za-z0-9+/]+=*)$/.exec(String(form.get("foto") ?? ""));
-  if (!id || !m) return error("Elegí una foto (JPG, PNG o WebP).");
-  const tipo = m[1];
-  const ext = TIPOS_FOTO[tipo];
-  const bytes = Uint8Array.from(atob(m[2]), (c) => c.charCodeAt(0));
+  const foto = leerFotoDataUrl(String(form.get("foto") ?? ""));
+  if (!id || !foto) return error("Elegí una foto (JPG, PNG o WebP).");
+  const { tipo, ext, bytes } = foto;
   if (bytes.length === 0) return error("Elegí una foto.");
   if (bytes.length > MAX_FOTO) return error("La foto pesa demasiado.");
 
