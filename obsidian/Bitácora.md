@@ -1,6 +1,6 @@
 ---
 tipo: bitacora
-actualizado: 2026-11-13
+actualizado: 2026-11-16
 ---
 
 # Bitácora
@@ -20,3 +20,11 @@ actualizado: 2026-11-13
   - Problema encontrado: la foto como archivo no llegaba a la Server Action dentro del Worker → se manda en base64. Ver [[Stack]].
   - Publicado en https://la-paleteria.lavadito.workers.dev. Secretos cargados (clave de prueba = la de `.dev.vars`). Se borraron los datos que dejó la prueba de humo: la base quedó con los 6 sabores, sin productos ni pedidos.
   - No se probó a mano en un navegador (la extensión de Chrome no estaba conectada); se vio la página pública con capturas de Edge sin ventana.
+
+## Sesión 3: 2026-11-16
+- Pedido 6: entorno local en una máquina nueva (Windows 11, Node 24.21, npm 11.19).
+  - Ya estaban `node_modules` (coincide con `package.json`) y un `.env` con los secretos. Se copió a `.dev.vars`, que es el que usa wrangler según el README. El `.env` se dejó como estaba.
+  - La D1 local no tenía migraciones: se corrió `npm run db:local` (0000 y 0001). Hay un `next dev` que ya estaba corriendo de antes y tiraba `no such table: sabores`; con las migraciones ya no da error.
+  - El typecheck fallaba porque falta `cloudflare-env.d.ts` (está en `.gitignore`): se generó con `npm run cf-typegen` y se agregó ese paso al README.
+  - Verificado: `npm test` 12/12, `npm run typecheck` sin errores, prueba de humo 25/25 en `wrangler dev` local, y `next dev` sirviendo `/` (catálogo vacío) y `/admin` (manda a ingresar).
+  - La prueba de humo dejó en la D1 **local** un producto "Prueba …" archivado y pedidos de "Cliente Prueba". Es solo local; no se borraron.

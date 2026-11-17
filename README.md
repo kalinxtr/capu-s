@@ -20,6 +20,7 @@ Pedidos de paletas heladas: una **página pública** con el stock por sabor (sin
 
 ```bash
 npm install
+npm run cf-typegen               # genera cloudflare-env.d.ts (no está en el repo; sin él falla el typecheck)
 cp .dev.vars.example .dev.vars   # y poner una clave y un secreto de 32+ caracteres
 npm run db:local                 # migraciones en la D1 local
 npm run dev                      # next dev (con bindings locales de D1/R2)

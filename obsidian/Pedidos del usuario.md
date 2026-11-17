@@ -43,3 +43,11 @@ Ya habilite r2, avanza hasta donde puedas, no importa el riesgo cpu
 Inspecciona toda la funcionalidad frontend. crea una rama nueva que sea 'ux-ui'. genera un reporte de mejoras, y en base a eso desplega un agente que cree un plan de implementacion para upgradearlo. Trabaja en automatico y preguntame antes de arrancar. el objetivo final es que implementes el plan en codigo.
 ```
 → Se revisó todo el frontend y se escribió [[Reporte UX-UI]]. Un agente armó [[Plan UX-UI]]. Se implementa en la rama `ux-ui`.
+
+## Sesión 3: 2026-11-16
+
+### 6
+```
+preparame el entorno local en esta maquina
+```
+→ Entorno local armado en la máquina nueva y verificado. Ver [[Bitácora]].
