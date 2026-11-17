@@ -1,6 +1,6 @@
 ---
 tipo: pedidos-crudos
-actualizado: 2026-11-13
+actualizado: 2026-11-16
 ---
 
 # Pedidos del usuario (crudos, tal cual)
@@ -51,3 +51,21 @@ Inspecciona toda la funcionalidad frontend. crea una rama nueva que sea 'ux-ui'.
 preparame el entorno local en esta maquina
 ```
 → Entorno local armado en la máquina nueva y verificado. Ver [[Bitácora]].
+
+### 7
+```
+Audita la arquitectura frontend con skills de ECC
+```
+```
+Al finalizar genera un spec | plan de implementacion (dependiendo de la complejidad de los problemas). Para implementar
+```
+```
+Si UX-UI ya tiene cambios pendientes que solucionan parte de los problemas, planifica desde ahi, escribi los cambios ahi, y al finalizar me reportas como quedo la rama contra main.
+```
+```
+Avanza hasta que queden los cambios listos para mergear a main, si necesitas chequear flujo y funcionamiento usa claude-in-chrome
+```
+```
+continua
+```
+→ [[Auditoría arquitectura frontend]] (7 hallazgos) y [[Plan arquitectura frontend]] (6 tareas), implementado en la rama `ux-ui`. Ver [[Bitácora]].

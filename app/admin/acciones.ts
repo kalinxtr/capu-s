@@ -3,8 +3,11 @@
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { db, env, excedido, ipCliente } from "@/lib/cloudflare";
+import { entero, texto } from "@/lib/entradas";
 import { parsePesos, telefonoValido } from "@/lib/formato";
+import { leerFotoDataUrl } from "@/lib/foto";
 import { cerrarSesion, claveCorrecta, exigirSesion, iniciarSesion } from "@/lib/sesion";
+import { moverEnLista } from "@/lib/stock";
 import { ESTADOS, type EstadoPedido, type Resultado } from "@/lib/tipos";
 
 // ───────────────────────── Sesión ─────────────────────────
@@ -29,17 +32,6 @@ export async function salir() {
 
 const ok = (mensaje?: string): Resultado => ({ ok: true, mensaje });
 const error = (e: string): Resultado => ({ ok: false, error: e });
-
-function entero(form: FormData, campo: string, min = 0, max = 1_000_000): number | null {
-  const v = String(form.get(campo) ?? "").trim();
-  if (!/^-?\d+$/.test(v)) return null;
-  const n = Number(v);
-  return Number.isSafeInteger(n) && n >= min && n <= max ? n : null;
-}
-
-function texto(form: FormData, campo: string, max: number): string {
-  return String(form.get(campo) ?? "").trim().slice(0, max);
-}
 
 // ───────────────────────── Pedidos ─────────────────────────
 
@@ -77,7 +69,8 @@ export async function cambiarEstado(_prev: Resultado, form: FormData): Promise<R
     .bind(estado, ahora, id)
     .run();
   refresh();
-  return r.meta.changes ? ok() : error("Un pedido cancelado no se puede reabrir.");
+  const mensaje = { nuevo: `Pedido #${id} volvió a nuevo.`, preparado: `Pedido #${id} listo.`, entregado: `Pedido #${id} entregado.` }[estado];
+  return r.meta.changes ? ok(mensaje) : error("Un pedido cancelado no se puede reabrir.");
 }
 
 // ───────────────────────── Sabores ─────────────────────────
@@ -94,15 +87,40 @@ export async function crearSabor(_prev: Resultado, form: FormData): Promise<Resu
   return ok(`Sabor "${nombre}" agregado.`);
 }
 
+/** Renombra un sabor. El orden se cambia con moverSabor. */
 export async function editarSabor(_prev: Resultado, form: FormData): Promise<Resultado> {
   await exigirSesion();
   const id = entero(form, "id", 1);
   const nombre = texto(form, "nombre", 40);
-  const orden = entero(form, "orden", 0, 9999);
-  if (!id || nombre.length < 2 || orden === null) return error("Revisá el nombre y el orden.");
-  await (await db()).prepare("UPDATE sabores SET nombre = ?, orden = ? WHERE id = ?").bind(nombre, orden, id).run();
+  if (!id || nombre.length < 2) return error("Escribí el nombre del sabor.");
+  await (await db()).prepare("UPDATE sabores SET nombre = ? WHERE id = ?").bind(nombre, id).run();
   refresh();
-  return ok("Guardado.");
+  return ok("Sabor guardado.");
+}
+
+function direccion(form: FormData): "arriba" | "abajo" | null {
+  const d = String(form.get("dir"));
+  return d === "arriba" || d === "abajo" ? d : null;
+}
+
+/** Renumera el orden 1..n con el elemento movido (así también se arreglan empates viejos). */
+async function reordenar(DB: D1Database, tabla: "sabores" | "productos", ids: number[], id: number, dir: "arriba" | "abajo") {
+  const nuevo = moverEnLista(ids, id, dir);
+  if (!nuevo) return;
+  await DB.batch(nuevo.map((x, i) => DB.prepare(`UPDATE ${tabla} SET orden = ? WHERE id = ?`).bind(i + 1, x)));
+}
+
+/** Sube o baja un sabor un lugar en la página pública. */
+export async function moverSabor(_prev: Resultado, form: FormData): Promise<Resultado> {
+  await exigirSesion();
+  const id = entero(form, "id", 1);
+  const dir = direccion(form);
+  if (!id || !dir) return error("Movimiento inválido.");
+  const DB = await db();
+  const { results } = await DB.prepare("SELECT id FROM sabores WHERE activo = 1 ORDER BY orden, id").all<{ id: number }>();
+  await reordenar(DB, "sabores", results.map((r) => r.id), id, dir);
+  refresh();
+  return ok();
 }
 
 /** Archivar o reactivar: nunca se borra (los pedidos viejos lo nombran). */
@@ -113,7 +131,7 @@ export async function activarSabor(_prev: Resultado, form: FormData): Promise<Re
   if (!id || activo === null) return error("Sabor inválido.");
   await (await db()).prepare("UPDATE sabores SET activo = ? WHERE id = ?").bind(activo, id).run();
   refresh();
-  return ok();
+  return ok(activo ? "Sabor reactivado." : "Sabor archivado. Lo encontrás en Archivados.");
 }
 
 // ───────────────────────── Productos ─────────────────────────
@@ -145,7 +163,25 @@ export async function editarProducto(_prev: Resultado, form: FormData): Promise<
   if (!id || nombre.length < 2 || precio === null) return error("Revisá el nombre y el precio.");
   await (await db()).prepare("UPDATE productos SET nombre = ?, precio = ? WHERE id = ?").bind(nombre, precio, id).run();
   refresh();
-  return ok("Guardado.");
+  return ok(`"${nombre}" guardado.`);
+}
+
+/** Sube o baja un producto un lugar dentro de su sabor. */
+export async function moverProducto(_prev: Resultado, form: FormData): Promise<Resultado> {
+  await exigirSesion();
+  const id = entero(form, "id", 1);
+  const dir = direccion(form);
+  if (!id || !dir) return error("Movimiento inválido.");
+  const DB = await db();
+  const { results } = await DB.prepare(
+    `SELECT id FROM productos WHERE activo = 1
+       AND sabor_id = (SELECT sabor_id FROM productos WHERE id = ?) ORDER BY orden, id`,
+  )
+    .bind(id)
+    .all<{ id: number }>();
+  await reordenar(DB, "productos", results.map((r) => r.id), id, dir);
+  refresh();
+  return ok();
 }
 
 /** Suma o resta stock (botones + y −). Nunca baja de 0. */
@@ -177,10 +213,9 @@ export async function activarProducto(_prev: Resultado, form: FormData): Promise
   if (!id || activo === null) return error("Producto inválido.");
   await (await db()).prepare("UPDATE productos SET activo = ? WHERE id = ?").bind(activo, id).run();
   refresh();
-  return ok();
+  return ok(activo ? "Producto reactivado." : "Producto archivado. Lo encontrás en Archivados.");
 }
 
-const TIPOS_FOTO: Record<string, string> = { "image/webp": "webp", "image/jpeg": "jpg", "image/png": "png" };
 /** El cuerpo de una Server Action tiene 1 MB de tope en Next; en base64 la foto ocupa un 33 % más. */
 const MAX_FOTO = 700 * 1024;
 
@@ -188,13 +223,9 @@ const MAX_FOTO = 700 * 1024;
 export async function subirFoto(_prev: Resultado, form: FormData): Promise<Resultado> {
   await exigirSesion();
   const id = entero(form, "id", 1);
-  // La foto llega como data URL (base64), ya achicada por el navegador. Con OpenNext en Workers,
-  // un archivo binario dentro de una Server Action se pierde al decodificar (ver obsidian/Stack.md).
-  const m = /^data:(image\/(?:webp|jpeg|png));base64,([A-Za-z0-9+/]+=*)$/.exec(String(form.get("foto") ?? ""));
-  if (!id || !m) return error("Elegí una foto (JPG, PNG o WebP).");
-  const tipo = m[1];
-  const ext = TIPOS_FOTO[tipo];
-  const bytes = Uint8Array.from(atob(m[2]), (c) => c.charCodeAt(0));
+  const foto = leerFotoDataUrl(String(form.get("foto") ?? ""));
+  if (!id || !foto) return error("Elegí una foto (JPG, PNG o WebP).");
+  const { tipo, ext, bytes } = foto;
   if (bytes.length === 0) return error("Elegí una foto.");
   if (bytes.length > MAX_FOTO) return error("La foto pesa demasiado.");
 

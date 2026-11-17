@@ -28,6 +28,48 @@ export function fechaCorta(ms: number): string {
   return fechaHora.format(new Date(ms)).replace(",", "");
 }
 
+/** "2.500" (sin el signo pesos, para campos de precio). */
+export function numero(n: number): string {
+  return miles.format(Math.round(n));
+}
+
+const ZONA = "America/Argentina/Buenos_Aires";
+const diaAR = new Intl.DateTimeFormat("en-CA", { timeZone: ZONA, year: "numeric", month: "2-digit", day: "2-digit" });
+const horaAR = new Intl.DateTimeFormat("es-AR", { timeZone: ZONA, hour: "2-digit", minute: "2-digit", hour12: false });
+
+/**
+ * "recién", "hace 5 min", "hoy 16:40", "ayer 22:00" o "11/11 18:40".
+ * Argentina no tiene horario de verano: "ayer" es exactamente 24 h antes.
+ */
+export function haceCuanto(ms: number, ahora = Date.now()): string {
+  const seg = (ahora - ms) / 1000;
+  if (seg < 60) return "recién";
+  if (seg < 3600) return `hace ${Math.floor(seg / 60)} min`;
+  const dia = diaAR.format(new Date(ms));
+  if (dia === diaAR.format(new Date(ahora))) return `hoy ${horaAR.format(new Date(ms))}`;
+  if (dia === diaAR.format(new Date(ahora - 86_400_000))) return `ayer ${horaAR.format(new Date(ms))}`;
+  return fechaCorta(ms);
+}
+
+/** "5491123456789" → "1123456789". Si no es un celular argentino normalizado, lo deja igual. */
+export function telefonoLegible(t: string): string {
+  return /^549(\d{10})$/.exec(t)?.[1] ?? t;
+}
+
+export function linkTelefono(t: string): string {
+  return t.startsWith("549") ? `tel:+${t}` : `tel:${t}`;
+}
+
+export function linkMapa(direccion: string): string {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(direccion)}`;
+}
+
+/** Origen absoluto del sitio a partir del header Host (para links y la imagen para compartir). */
+export function origenSitio(host: string | null): string {
+  if (!host) return "https://la-paleteria.lavadito.workers.dev";
+  return /^(localhost|127\.0\.0\.1)(:|$)/.test(host) ? `http://${host}` : `https://${host}`;
+}
+
 /**
  * Normaliza un teléfono argentino al formato de wa.me: 549 + área + número.
  * Mejor esfuerzo (copiado de Lavadito): si no reconoce el formato, devuelve solo los dígitos.

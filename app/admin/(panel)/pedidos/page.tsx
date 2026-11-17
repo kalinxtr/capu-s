@@ -1,72 +1,127 @@
+import type { Metadata } from "next";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { db } from "@/lib/cloudflare";
-import { contarPorEstado, leerPedidos, type PedidoConItems } from "@/lib/datos";
-import { fechaCorta, linkWhatsApp, pesos } from "@/lib/formato";
-import { textoPedido } from "@/lib/pedido";
+import { ajustesActuales, cuentaPedidos, leerPedidos, type PedidoConItems } from "@/lib/datos";
+import { fechaCorta, haceCuanto, linkMapa, linkTelefono, linkWhatsApp, origenSitio, pesos, telefonoLegible } from "@/lib/formato";
+import { mensajeAlCliente } from "@/lib/mensajes";
+import { aPreparar } from "@/lib/pedido";
 import { requerirSesion } from "@/lib/sesion";
 import { ESTADOS, NOMBRE_ESTADO, type EstadoPedido } from "@/lib/tipos";
+import { Refrescar } from "../../../compartidos";
 import { cambiarEstado } from "../../acciones";
-import { BotonSeguro, FormAccion, Refrescar } from "../../componentes";
+import { BotonSeguro, FormAccion } from "../../_componentes/formularios";
+import { BotonEstado, MarcaNueva, RegistrarVistos } from "../../_componentes/pedidos";
 
 type Filtro = EstadoPedido | "activos" | "todos";
 const FILTROS: Filtro[] = ["activos", ...ESTADOS, "todos"];
 const NOMBRE_FILTRO: Record<Filtro, string> = { activos: "Por resolver", todos: "Todos", ...NOMBRE_ESTADO };
+const LIMITE = 100;
+
+export async function generateMetadata(): Promise<Metadata> {
+  await requerirSesion();
+  const c = await cuentaPedidos();
+  return { title: c.nuevo ? `(${c.nuevo}) Pedidos` : "Pedidos" };
+}
 
 export default async function Pedidos({ searchParams }: PageProps<"/admin/pedidos">) {
   await requerirSesion();
   const pedido = (await searchParams).estado;
   const filtro: Filtro = FILTROS.includes(pedido as Filtro) ? (pedido as Filtro) : "activos";
-  const DB = await db();
-  const [pedidos, cuenta] = await Promise.all([leerPedidos(DB, filtro), contarPorEstado(DB)]);
-  const numero = (f: Filtro) =>
-    f === "activos" ? cuenta.nuevo + cuenta.preparado : f === "todos" ? null : cuenta[f];
+  const [pedidos, cuenta, ajustes, h] = await Promise.all([
+    leerPedidos(await db(), filtro, LIMITE),
+    cuentaPedidos(),
+    ajustesActuales(),
+    headers(),
+  ]);
+  const origen = origenSitio(h.get("host"));
+  const ahora = Date.now();
+  const numero = (f: Filtro) => (f === "activos" ? cuenta.nuevo + cuenta.preparado : f === "todos" ? null : cuenta[f]);
+
+  const nuevos = pedidos.filter((p) => p.estado === "nuevo");
+  const produccion = (filtro === "activos" || filtro === "nuevo") && nuevos.length > 0 ? aPreparar(nuevos) : [];
 
   return (
     <main>
-      <Refrescar segundos={30} />
+      <Refrescar segundos={30} oculta={60} />
+      <RegistrarVistos maxId={Math.max(0, ...pedidos.map((p) => p.id))} />
       <h1>Pedidos</h1>
-      <nav className="filtros">
+      <nav className="filtros" aria-label="Filtrar pedidos">
         {FILTROS.map((f) => (
-          <Link key={f} href={`/admin/pedidos?estado=${f}`} className={f === filtro ? "activo" : ""}>
+          <Link key={f} href={`/admin/pedidos?estado=${f}`} aria-current={f === filtro ? "page" : undefined}>
             {NOMBRE_FILTRO[f]}
             {numero(f) !== null && <span className="cuenta">{numero(f)}</span>}
           </Link>
         ))}
       </nav>
+
+      {produccion.length > 0 && (
+        <details className="tarjeta a-preparar" open>
+          <summary>
+            Para preparar · {produccion.reduce((t, x) => t + x.cantidad, 0)} paletas de {nuevos.length}{" "}
+            {nuevos.length === 1 ? "pedido nuevo" : "pedidos nuevos"}
+          </summary>
+          <ul className="resumen">
+            {produccion.map((x) => (
+              <li key={x.nombre}>
+                <span>{x.nombre}</span>
+                <strong>{x.cantidad}</strong>
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
+
       {pedidos.length === 0 ? (
-        <p className="vacio">No hay pedidos acá.</p>
+        <p className="vacio">{filtro === "activos" ? "No hay pedidos por resolver. ¡Todo al día!" : "No hay pedidos acá."}</p>
       ) : (
         <ul className="pedidos">
           {pedidos.map((p) => (
-            <TarjetaPedido key={p.id} p={p} />
+            <TarjetaPedido
+              key={p.id}
+              p={p}
+              ahora={ahora}
+              whatsapp={linkWhatsApp(
+                p.cliente_telefono,
+                mensajeAlCliente(p, { textoRetiro: ajustes.texto_retiro, link: `${origen}/pedido/${p.token}` }),
+              )}
+            />
           ))}
         </ul>
       )}
+      {pedidos.length === LIMITE && <p className="ayuda centrado">Mostrando los últimos {LIMITE} pedidos.</p>}
     </main>
   );
 }
 
-function TarjetaPedido({ p }: { p: PedidoConItems }) {
-  const aviso =
-    p.estado === "preparado"
-      ? `Hola ${p.cliente_nombre}! Tu pedido #${p.id} ya está listo.`
-      : `Hola ${p.cliente_nombre}! Recibimos tu pedido:\n${textoPedido(p)}`;
-  const boton = (estado: EstadoPedido, texto: string, clase = "boton") => (
-    <FormAccion accion={cambiarEstado} ocultos={{ id: p.id, estado }}>
-      <button className={clase}>{texto}</button>
-    </FormAccion>
-  );
-
+function TarjetaPedido({ p, ahora, whatsapp }: { p: PedidoConItems; ahora: number; whatsapp: string }) {
   return (
-    <li className={`tarjeta pedido estado-${p.estado}`}>
+    <li id={`pedido-${p.id}`} className={`tarjeta pedido estado-${p.estado}`}>
       <div className="pedido-cabeza">
-        <strong>
+        <strong className="pedido-titulo">
           #{p.id} · {p.cliente_nombre}
         </strong>
-        <span className={`estado estado-${p.estado}`}>{NOMBRE_ESTADO[p.estado]}</span>
+        <MarcaNueva id={p.id} />
+        <span className={`chip estado-${p.estado}`}>{NOMBRE_ESTADO[p.estado]}</span>
       </div>
-      <p className="ayuda">
-        {fechaCorta(p.creado)} · {p.entrega === "envio" ? <>Envío a <strong>{p.direccion}</strong></> : "Retira en el local"}
+      <p className="pedido-meta">
+        <time dateTime={new Date(p.creado).toISOString()} title={fechaCorta(p.creado)}>
+          {haceCuanto(p.creado, ahora)}
+        </time>
+        {" · "}
+        <a href={linkTelefono(p.cliente_telefono)}>{telefonoLegible(p.cliente_telefono)}</a>
+      </p>
+      <p className="pedido-meta">
+        {p.entrega === "envio" ? (
+          <>
+            Envío a{" "}
+            <a href={linkMapa(p.direccion ?? "")} target="_blank" rel="noopener noreferrer">
+              <strong>{p.direccion}</strong>
+            </a>
+          </>
+        ) : (
+          "Retira en el local"
+        )}
       </p>
       <ul className="resumen">
         {p.items.map((i) => (
@@ -84,15 +139,19 @@ function TarjetaPedido({ p }: { p: PedidoConItems }) {
       </ul>
       {p.nota && <p className="nota">“{p.nota}”</p>}
       <div className="acciones">
-        <a className="boton whatsapp" href={linkWhatsApp(p.cliente_telefono, aviso)} target="_blank" rel="noopener noreferrer">
+        <a className="boton whatsapp" href={whatsapp} target="_blank" rel="noopener noreferrer">
           WhatsApp
         </a>
-        {p.estado === "nuevo" && boton("preparado", "Preparado", "boton-principal")}
-        {p.estado === "preparado" && boton("entregado", "Entregado", "boton-principal")}
-        {p.estado === "preparado" && boton("nuevo", "Volver a nuevo")}
-        {p.estado === "entregado" && boton("preparado", "Volver a preparado")}
+        {p.estado === "nuevo" && <BotonEstado id={p.id} estado="preparado" texto="Preparado" principal deshacerA="nuevo" />}
+        {p.estado === "preparado" && (
+          <>
+            <BotonEstado id={p.id} estado="entregado" texto="Entregado" principal deshacerA="preparado" />
+            <BotonEstado id={p.id} estado="nuevo" texto="Volver a nuevo" />
+          </>
+        )}
+        {p.estado === "entregado" && <BotonEstado id={p.id} estado="preparado" texto="Volver a preparado" />}
         {(p.estado === "nuevo" || p.estado === "preparado") && (
-          <FormAccion accion={cambiarEstado} ocultos={{ id: p.id, estado: "cancelado" }}>
+          <FormAccion accion={cambiarEstado} ocultos={{ id: p.id, estado: "cancelado" }} className="cancelar">
             <BotonSeguro className="boton peligro" pregunta="¿Cancelar? Vuelve el stock">
               Cancelar
             </BotonSeguro>

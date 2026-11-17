@@ -1,4 +1,6 @@
 import "server-only";
+import { cache } from "react";
+import { db } from "./cloudflare";
 import type { Ajustes, EstadoPedido, Pedido, PedidoItem, Producto, Sabor } from "./tipos";
 
 /** Consultas de lectura. Las escrituras viven en las Server Actions. */
@@ -63,3 +65,8 @@ export async function pedidoPorToken(DB: D1Database, token: string): Promise<Ped
   const p = await DB.prepare(`SELECT ${COLUMNAS_PEDIDO} FROM pedidos WHERE token = ?`).bind(token).first<Pedido>();
   return p ? (await conItems(DB, [p]))[0] : null;
 }
+
+// Versiones memorizadas por request (React `cache`): la metadata y la página no consultan dos veces.
+export const ajustesActuales = cache(async () => leerAjustes(await db()));
+export const cuentaPedidos = cache(async () => contarPorEstado(await db()));
+export const pedidoDelToken = cache(async (token: string) => pedidoPorToken(await db(), token));

@@ -1,6 +1,6 @@
 ---
 tipo: decisiones
-actualizado: 2026-11-13
+actualizado: 2026-11-14
 ---
 
 # Decisiones y reglas de negocio
@@ -35,12 +35,27 @@ actualizado: 2026-11-13
 - **Datos del local** (nombre, WhatsApp, indicaciones de retiro) van abajo de todo en Stock, no en una sección aparte (el usuario pidió solo Pedidos y Stock).
 - **Confirmación:** número de pedido, resumen, botón "Avisar por WhatsApp" al local (si cargó su número) y link privado `/pedido/<token>`.
 - **Anti-abuso:** 5 pedidos por minuto por IP y 10 intentos de ingreso por minuto por IP (rate limiter de Workers). Sin Turnstile por ahora.
-- **Fotos:** el navegador las achica a 800 px WebP; viajan como data URL (base64) dentro de la Server Action, porque en el Worker los archivos binarios se pierden. Tope 700 KB. Se sirven desde `/img/<clave>` con caché de un año (la clave cambia si cambia la foto).
+- **Fotos:** el navegador las achica a 320 px WebP de lado mayor (se muestran a 76 px; antes eran 800, pedido 7); viajan como data URL (base64) dentro de la Server Action, porque en el Worker los archivos binarios se pierden. Tope 700 KB. Se sirven desde `/img/<clave>` con caché de un año (la clave cambia si cambia la foto).
 - **Sin Drizzle:** SQL directo sobre D1 y migraciones escritas a mano en `migrations/`. Son pocas consultas y así el Worker pesa menos.
 - `cacheComponents` apagado: cuelga el Worker con OpenNext (ver [[Stack]]).
 - Stock: `CHECK (stock >= 0)` y alta del pedido + descuento en un mismo batch de D1. Probado con pedidos simultáneos.
 - Precios: siempre se leen de la base al crear el pedido; nombre y precio se copian en cada ítem.
 - Montos en pesos enteros; fechas en milisegundos UTC, mostradas en hora argentina.
+
+## Confirmadas por el usuario (pedido 5, mejoras UX/UI)
+- **Fuente de títulos: Fraunces 600** (con `next/font`, se sirve como archivo estático). El texto sigue con la fuente del sistema.
+- **"Recordar mis datos en este celular" viene marcado**: nombre, teléfono, entrega y dirección quedan solo en el navegador del cliente.
+- **Textos al cliente**: "Te escribimos por WhatsApp cuando esté listo" y "Listo para retirar / enviar" (asumen que el local le escribe).
+
+## Tomadas en el pedido 5 (corregibles)
+- **La confirmación vive en `/pedido/<token>?nuevo=1`**: `crearPedido` redirige ahí. La URL no se pierde al recargar. Ese link muestra pasos (Recibido → Listo → Entregado) y se refresca cada 45 s.
+- **Stock en el admin optimista y por diferencia**: los +/− se ven al instante y viajan como delta (si entra un pedido al mismo tiempo, no se pisa). El campo se guarda al salir de él.
+- **Orden de sabores y productos con botones ↑/↓** (ya no con un número a mano).
+- **La elección del cliente** sobrevive a una recarga (sessionStorage); si el stock bajó, se recorta y se avisa qué cambió.
+- **Archivar y quitar foto piden un segundo toque**, como Cancelar.
+- **Mensajes de WhatsApp al cliente según el estado** del pedido (recibido, listo, entregado, cancelado).
+- **Pedidos nuevos**: número en la pestaña "(2) Pedidos" y en la barra; las tarjetas nuevas desde la última visita se marcan. Sin sonido.
+- **Avisos flotantes** que se van solos; al marcar Preparado/Entregado traen "Deshacer".
 
 ## Abiertas (ver [[Pendientes]])
 - Clave definitiva del admin.
