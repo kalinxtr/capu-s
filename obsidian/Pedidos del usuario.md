@@ -102,3 +102,9 @@ LEVANTAMELO EN LOCAL PARA PROBARLO
 dejame solamente las categorias de muzza, peperoni, ugazzeta y roquefort
 ```
 → Sabores: Muzza, Pepperoni, Fugazzeta y Roquefort (se corrigió la ortografía de "peperoni" y "ugazzeta"). Ver [[Bitácora]].
+
+### 13
+```
+soluciona los conflictos en local de git, no puedo pushear los cambios
+```
+→ No eran conflictos: `origin` apuntaba a la carpeta local de La Paletería (quedó del clon). El usuario creó `kalinxtr/capu-s`; se apuntó `origin` ahí y se hizo push de `main`. Ver [[Bitácora]].
