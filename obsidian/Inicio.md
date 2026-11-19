@@ -16,6 +16,6 @@ Las notas de abajo (salvo [[Inicio]], [[Pendientes]] y la última sesión de [[B
 4. [[Bitácora]]: qué se hizo en cada sesión.
 5. Heredadas: [[Brief original]], [[Mapeo desde Lavadito]], [[Stack]], [[Diseño]], [[Reporte UX-UI]], [[Plan UX-UI]], [[Auditoría arquitectura frontend]], [[Plan arquitectura frontend]].
 
-**Estado actual (2026-11-19):** copia adaptada y probada en local (51 pruebas, prueba de humo de 30 pasos). **Sin publicar**: todavía no existen la D1, el R2 ni el Worker en Cloudflare. Ver [[Pendientes]].
+**Estado actual (2026-11-19):** **publicada** en https://la-pizzeria.lavadito.workers.dev (admin en `/admin`), misma cuenta de Cloudflare que La Paletería. D1 `la-pizzeria` (solo los 4 sabores, sin productos), fotos en R2 `la-pizzeria-imagenes`. Prueba de humo de 30 pasos en verde contra lo publicado (y sus datos borrados). Repo: https://github.com/kalinxtr/capu-s. Ver [[Pendientes]].
 
 Comandos, deploy y trampas: `README.md` en la raíz del repo.

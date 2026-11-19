@@ -3,7 +3,7 @@
 Pedidos de pizzas: una **página pública** con el stock por sabor (sin stock = deshabilitado) y un **admin** con Pedidos y Stock. Es una copia de [La Paletería](https://github.com/kalinxtr/la-paleteria) (remoto `upstream`) con la misma lógica: solo cambian la marca, los colores y los sabores iniciales.
 
 - **Stack:** Next.js 16 (App Router + Server Actions) en Cloudflare Workers con `@opennextjs/cloudflare`, base **D1** (SQLite) e imágenes en **R2**.
-- **Entorno de prueba:** todavía no está publicado. Ver "Primer deploy" abajo.
+- **Publicado:** https://la-pizzeria.lavadito.workers.dev (admin en `/admin`). Cuenta de Cloudflare: la misma que La Paletería (subdominio `lavadito`).
 - Notas del proyecto, decisiones y bitácora: `obsidian/` (empezar por `obsidian/Inicio.md`).
 
 ## Rutas
@@ -42,9 +42,9 @@ node scripts/humo.mjs http://localhost:8787 <clave-admin>
 
 Crea un producto "Prueba …" en el sabor 1 y pedidos de "Cliente Prueba". Contra el entorno publicado, borrarlos después.
 
-## Primer deploy (una sola vez)
+## Primer deploy (hecho el 2026-11-19)
 
-La D1 y el bucket R2 de este proyecto todavía no existen en Cloudflare. `wrangler.jsonc` tiene un `database_id` de relleno (todo ceros).
+Ya se hizo: D1 `la-pizzeria` y R2 `la-pizzeria-imagenes` creados, migraciones aplicadas, secretos cargados. Queda como referencia si hubiera que rehacerlo en otra cuenta:
 
 ```bash
 npx wrangler d1 create la-pizzeria          # copiar el database_id que devuelve a wrangler.jsonc

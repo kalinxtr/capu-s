@@ -80,3 +80,11 @@ actualizado: 2026-11-19
 - Pedido 11: levantada en local con `npm run dev -- --port 3010` (D1 local reiniciada y 7 productos de ejemplo cargados a mano, no van en las migraciones). Hubo que matar un `wrangler dev` de la prueba de humo que había quedado colgado y tenía tomada la D1 local.
 - Pedido 12: sabores iniciales reducidos a **Muzza, Pepperoni, Fugazzeta y Roquefort**. Cambiado en `migrations/0001_datos_iniciales.sql` (sin publicar todavía, así que se editó la migración en vez de agregar una nueva) y en la D1 local (renombrados; los dos sobrantes y sus productos de ejemplo se borraron, no había pedidos).
 - Pedido 13: el push fallaba porque `origin` era la carpeta local `la-paleteria` (main con checkout ahí → rechazado). Con autorización del usuario: `origin` = https://github.com/kalinxtr/capu-s.git y push de `main` (commits del usuario `f167f89` y `b6dce68`). No se agregó `upstream` (el usuario lo había apuntado también a `capu-s`).
+- Pedidos 14 y 15: el primer `wrangler login` entró con otra cuenta de Cloudflare (sin la D1 de La Paletería y sin R2 activado). Se hizo logout y login de nuevo (el primer reintento venció); quedó la cuenta correcta, la de `lavadito.workers.dev`.
+- Pedido 16, publicada:
+  - D1 `la-pizzeria` (`2d169f43-…`, región ENAM) y R2 `la-pizzeria-imagenes` creados; `database_id` real en `wrangler.jsonc`; migraciones remotas aplicadas (4 sabores).
+  - `npm run deploy`: Worker de 1,15 MiB comprimido en https://la-pizzeria.lavadito.workers.dev.
+  - Secretos `ADMIN_CLAVE` (nueva, distinta de la local) y `SESION_SECRETO` con `wrangler secret bulk`.
+  - Prueba de humo de 30 pasos contra lo publicado: en verde (se corrió dos veces por error). Después se borraron sus datos: 2 pedidos de prueba con sus ítems, 2 productos "Prueba", sus 2 fotos en R2, el contador de pedidos (el primero real será el #1) y el WhatsApp/retiro falsos de los ajustes.
+  - Verificado: `/` 200, `/admin/ingresar` 200, `/no-existe` 404, `og.png` e `icon.svg` 200.
+  - Como cambió el `database_id`, la D1 local también es otra: se le aplicaron las migraciones y los 5 productos de ejemplo, así `npm run dev` sigue igual al reiniciarse.

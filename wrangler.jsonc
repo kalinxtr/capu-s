@@ -14,7 +14,7 @@
 		{
 			"binding": "DB",
 			"database_name": "la-pizzeria",
-			"database_id": "00000000-0000-0000-0000-000000000000", // Reemplazar por el id que da `npx wrangler d1 create la-pizzeria`
+			"database_id": "2d169f43-1468-428d-8bd1-bf0bbcfb0ffc",
 			"migrations_dir": "migrations"
 		}
 	],

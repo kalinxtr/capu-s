@@ -108,3 +108,18 @@ dejame solamente las categorias de muzza, peperoni, ugazzeta y roquefort
 soluciona los conflictos en local de git, no puedo pushear los cambios
 ```
 → No eran conflictos: `origin` apuntaba a la carpeta local de La Paletería (quedó del clon). El usuario creó `kalinxtr/capu-s`; se apuntó `origin` ahí y se hizo push de `main`. Ver [[Bitácora]].
+
+### 14
+```
+levantalo en cloudflare
+```
+→ El login de wrangler había quedado con otra cuenta. Ver [[Bitácora]].
+
+### 15
+```
+reseteame el login
+```
+```
+volve a lanzar el login
+```
+→ Logout y login de nuevo; quedó la cuenta de La Paletería (`lavadito.workers.dev`). Con eso se siguió con el pedido 14: ver [[Bitácora]] (pedido 16 en la bitácora = el deploy).
