@@ -19,8 +19,8 @@ const ejemplo = {
   nota: null,
   total: 7500,
   items: [
-    { nombre: "Oreo · Paleta", cantidad: 2, precio: 2500 },
-    { nombre: "Dubai · Paleta", cantidad: 1, precio: 2500 },
+    { nombre: "Muzzarella · Grande", cantidad: 2, precio: 2500 },
+    { nombre: "Napolitana · Grande", cantidad: 1, precio: 2500 },
   ],
 };
 
@@ -67,7 +67,7 @@ describe("formato para el admin", () => {
     expect(origenSitio("localhost:8787")).toBe("http://localhost:8787");
     expect(origenSitio("127.0.0.1:3000")).toBe("http://127.0.0.1:3000");
     expect(origenSitio("x.workers.dev")).toBe("https://x.workers.dev");
-    expect(origenSitio(null)).toBe("https://la-paleteria.lavadito.workers.dev");
+    expect(origenSitio(null)).toBe("https://la-pizzeria.lavadito.workers.dev");
   });
 });
 
@@ -75,7 +75,7 @@ describe("mensajeAlCliente", () => {
   it("nuevo, con y sin link", () => {
     const sin = mensajeAlCliente({ ...ejemplo, estado: "nuevo" });
     expect(sin).toBe(
-      "Hola Ana! Recibimos tu pedido #7:\nPedido #7 · Ana\n• 2 × Oreo · Paleta ($ 5.000)\n• 1 × Dubai · Paleta ($ 2.500)\nTotal: $ 7.500\nEnvío a: Calle 123",
+      "Hola Ana! Recibimos tu pedido #7:\nPedido #7 · Ana\n• 2 × Muzzarella · Grande ($ 5.000)\n• 1 × Napolitana · Grande ($ 2.500)\nTotal: $ 7.500\nEnvío a: Calle 123",
     );
     const con = mensajeAlCliente({ ...ejemplo, estado: "nuevo" }, { link: "https://x/pedido/abc" });
     expect(con).toBe(sin + "\nSeguilo acá: https://x/pedido/abc");
@@ -149,19 +149,19 @@ describe("aPreparar", () => {
   it("suma por producto y ordena", () => {
     expect(
       aPreparar([
-        { items: [{ nombre: "Oreo · Paleta", cantidad: 2 }, { nombre: "Dubai · Paleta", cantidad: 1 }] },
-        { items: [{ nombre: "Oreo · Paleta", cantidad: 1 }] },
+        { items: [{ nombre: "Muzzarella · Grande", cantidad: 2 }, { nombre: "Napolitana · Grande", cantidad: 1 }] },
+        { items: [{ nombre: "Muzzarella · Grande", cantidad: 1 }] },
       ]),
     ).toEqual([
-      { nombre: "Oreo · Paleta", cantidad: 3 },
-      { nombre: "Dubai · Paleta", cantidad: 1 },
+      { nombre: "Muzzarella · Grande", cantidad: 3 },
+      { nombre: "Napolitana · Grande", cantidad: 1 },
     ]);
   });
 
   it("empates por nombre", () => {
     expect(
-      aPreparar([{ items: [{ nombre: "Rasta", cantidad: 1 }, { nombre: "Dubai", cantidad: 1 }] }]).map((x) => x.nombre),
-    ).toEqual(["Dubai", "Rasta"]);
+      aPreparar([{ items: [{ nombre: "Napolitana", cantidad: 1 }, { nombre: "Calabresa", cantidad: 1 }] }]).map((x) => x.nombre),
+    ).toEqual(["Calabresa", "Napolitana"]);
   });
 });
 
@@ -175,34 +175,34 @@ describe("elección guardada", () => {
 
   it("recortarEleccion recorta y avisa", () => {
     const r = recortarEleccion({ 1: 3, 2: 1, 9: 2 }, [
-      { id: 1, nombre: "Oreo · Paleta", stock: 2 },
-      { id: 2, nombre: "Dubai · Paleta", stock: 0 },
+      { id: 1, nombre: "Muzzarella · Grande", stock: 2 },
+      { id: 2, nombre: "Napolitana · Grande", stock: 0 },
     ]);
     expect(r.eleccion).toEqual({ 1: 2 });
     expect(r.recortes).toEqual([
-      { id: 1, nombre: "Oreo · Paleta", pedidas: 3, quedan: 2 },
-      { id: 2, nombre: "Dubai · Paleta", pedidas: 1, quedan: 0 },
+      { id: 1, nombre: "Muzzarella · Grande", pedidas: 3, quedan: 2 },
+      { id: 2, nombre: "Napolitana · Grande", pedidas: 1, quedan: 0 },
     ]);
     expect(r.cambio).toBe(true);
   });
 
   it("recortarEleccion sin cambios devuelve la misma referencia", () => {
     const e = { 1: 2 };
-    const r = recortarEleccion(e, [{ id: 1, nombre: "Oreo · Paleta", stock: 5 }]);
+    const r = recortarEleccion(e, [{ id: 1, nombre: "Muzzarella · Grande", stock: 5 }]);
     expect(r.cambio).toBe(false);
     expect(r.eleccion).toBe(e);
     expect(r.recortes).toEqual([]);
   });
 
   it("textoRecorte", () => {
-    expect(textoRecorte({ id: 1, nombre: "Oreo · Paleta", pedidas: 3, quedan: 2 })).toBe(
-      "Oreo · Paleta: quedaban 2, te dejamos 2.",
+    expect(textoRecorte({ id: 1, nombre: "Muzzarella · Grande", pedidas: 3, quedan: 2 })).toBe(
+      "Muzzarella · Grande: quedaban 2, te dejamos 2.",
     );
-    expect(textoRecorte({ id: 1, nombre: "Oreo · Paleta", pedidas: 3, quedan: 1 })).toBe(
-      "Oreo · Paleta: quedaba 1, te dejamos 1.",
+    expect(textoRecorte({ id: 1, nombre: "Muzzarella · Grande", pedidas: 3, quedan: 1 })).toBe(
+      "Muzzarella · Grande: quedaba 1, te dejamos 1.",
     );
-    expect(textoRecorte({ id: 1, nombre: "Oreo · Paleta", pedidas: 3, quedan: 0 })).toBe(
-      "Oreo · Paleta se agotó y la sacamos de tu pedido.",
+    expect(textoRecorte({ id: 1, nombre: "Muzzarella · Grande", pedidas: 3, quedan: 0 })).toBe(
+      "Muzzarella · Grande se agotó y la sacamos de tu pedido.",
     );
   });
 });

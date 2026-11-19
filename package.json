@@ -1,5 +1,5 @@
 {
-  "name": "la-paleteria",
+  "name": "la-pizzeria",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -7,8 +7,8 @@
     "build": "next build",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
-    "db:local": "wrangler d1 migrations apply la-paleteria --local",
-    "db:remota": "wrangler d1 migrations apply la-paleteria --remote",
+    "db:local": "wrangler d1 migrations apply la-pizzeria --local",
+    "db:remota": "wrangler d1 migrations apply la-pizzeria --remote",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"

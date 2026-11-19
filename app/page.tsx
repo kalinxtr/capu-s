@@ -4,7 +4,7 @@ import { connection } from "next/server";
 import { db } from "@/lib/cloudflare";
 import { ajustesActuales, leerCatalogo } from "@/lib/datos";
 import { origenSitio } from "@/lib/formato";
-import { LogoPaleta } from "./LogoPaleta";
+import { LogoPizza } from "./LogoPizza";
 import { Pedir } from "./Pedir";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -13,11 +13,11 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     metadataBase: new URL(origenSitio(h.get("host"))),
     title: { absolute: a.nombre_local },
-    description: "Paletas heladas: mirá qué hay y hacé tu pedido.",
+    description: "Pizzas: mirá qué hay y hacé tu pedido.",
     openGraph: {
       title: a.nombre_local,
       description: "Mirá qué hay y hacé tu pedido.",
-      images: [{ url: "/og.png", width: 1200, height: 630, alt: "Paletas heladas" }],
+      images: [{ url: "/og.png", width: 1200, height: 630, alt: "Pizzas" }],
       locale: "es_AR",
       type: "website",
     },
@@ -35,7 +35,7 @@ export default async function Inicio() {
     <main className="publico">
       <header className="cabecera">
         <div className="marca">
-          <LogoPaleta />
+          <LogoPizza />
           <h1>{ajustes.nombre_local}</h1>
         </div>
         <p className="bajada">Elegí cuántas querés, hacé tu pedido y coordinamos por WhatsApp.</p>
@@ -46,7 +46,7 @@ export default async function Inicio() {
         )}
       </header>
       {secciones.length === 0 ? (
-        <p className="vacio">Por ahora no hay paletas cargadas. Volvé más tarde.</p>
+        <p className="vacio">Por ahora no hay pizzas cargadas. Volvé más tarde.</p>
       ) : (
         <Pedir
           secciones={secciones.map((s) => ({

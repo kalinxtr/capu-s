@@ -53,7 +53,7 @@ export function BotonEstado({
 }
 
 // Último pedido que el admin vio, guardado en su navegador. Lo nuevo desde entonces se marca.
-const CLAVE_VISTO = "paleteria:ultimo-pedido-visto";
+const CLAVE_VISTO = "pizzeria:ultimo-pedido-visto";
 let ultimoVisto: number | null = null;
 let vistoLeido = false;
 const suscriptores = new Set<() => void>();

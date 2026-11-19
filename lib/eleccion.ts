@@ -3,8 +3,8 @@ import type { Entrega } from "./tipos";
 
 /** Lo que el cliente va eligiendo y sus datos, guardados solo en su navegador. Todo puro, sin DOM. */
 
-export const CLAVE_ELECCION = "paleteria:eleccion"; // sessionStorage
-export const CLAVE_CLIENTE = "paleteria:cliente"; // localStorage
+export const CLAVE_ELECCION = "pizzeria:eleccion"; // sessionStorage
+export const CLAVE_CLIENTE = "pizzeria:cliente"; // localStorage
 export const STOCK_BAJO = 3;
 
 export type Eleccion = Record<number, number>;

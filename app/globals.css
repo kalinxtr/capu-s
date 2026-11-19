@@ -1,4 +1,4 @@
-/* La Paletería: crema de helado, chocolate y frambuesa. Mobile first, CSS plano.
+/* La Pizzería: masa, tomate y queso. Mobile first, CSS plano.
    Contrastes calculados con WCAG 2.x (ver obsidian/Plan UX-UI.md §3). */
 
 /* ───────────── 1. Tokens (claro) ───────────── */
@@ -10,10 +10,10 @@
   --suave: #6e5a4f;
   --linea: #ecdccd;
   --borde-control: #a38979;
-  --acento: #c2255c;
+  --acento: #c0351b;
   --acento-tinta: #ffffff;
-  --acento-suave: #fde7ee;
-  --acento-fuerte: #9e1c4a;
+  --acento-suave: #fde8e1;
+  --acento-fuerte: #952812;
   --ok: #2f7d4f;
   --peligro: #b42318;
   --peligro-tinta: #ffffff;
@@ -23,9 +23,9 @@
   --fondo-hoja: rgb(28 19 16 / 50%);
 
   /* Chips de estado: texto / fondo / borde de tarjeta */
-  --nuevo-t: #9e1c4a;
-  --nuevo-f: #fde7ee;
-  --nuevo-b: #c2255c;
+  --nuevo-t: #952812;
+  --nuevo-f: #fde8e1;
+  --nuevo-b: #c0351b;
   --preparado-t: #7a4300;
   --preparado-f: #fdf0d9;
   --preparado-b: #9a5b00;
@@ -84,10 +84,10 @@
     --suave: #bfa99b;
     --linea: #43322a;
     --borde-control: #8a7264;
-    --acento: #f06595;
-    --acento-tinta: #2b0a16;
-    --acento-suave: #4a1d2c;
-    --acento-fuerte: #ffb3c8;
+    --acento: #ff8a5c;
+    --acento-tinta: #2b0d05;
+    --acento-suave: #4a2116;
+    --acento-fuerte: #ffb89c;
     --ok: #5cc489;
     --peligro: #ff7b6e;
     --peligro-tinta: #1c1310;
@@ -96,9 +96,9 @@
     --velo: rgb(28 19 16 / 80%);
     --fondo-hoja: rgb(0 0 0 / 60%);
 
-    --nuevo-t: #ffb3c8;
-    --nuevo-f: #4a1d2c;
-    --nuevo-b: #f06595;
+    --nuevo-t: #ffb89c;
+    --nuevo-f: #4a2116;
+    --nuevo-b: #ff8a5c;
     --preparado-t: #ffd48a;
     --preparado-f: #4a3410;
     --preparado-b: #f2b84b;

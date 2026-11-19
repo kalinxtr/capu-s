@@ -1,14 +1,13 @@
-/** Paleta de frambuesa con baño de chocolate. El mismo dibujo que `app/icon.svg`. */
-export function LogoPaleta({ tamano = 40 }: { tamano?: number }) {
+/** Porción de pizza con borde de masa, queso y pepperoni. El mismo dibujo que `public/icon.svg`. */
+export function LogoPizza({ tamano = 40 }: { tamano?: number }) {
   return (
     <svg className="logo" width={tamano} height={tamano} viewBox="0 0 64 64" aria-hidden focusable="false">
-      <rect x="27" y="40" width="10" height="21" rx="5" fill="#d9a066" />
-      <rect x="15" y="4" width="34" height="42" rx="17" fill="#c2255c" />
-      <path
-        d="M15 21A17 17 0 0 1 49 21V27Q46 33 43 27Q40 21 37 29Q34 37 31 29Q28 21 25 28Q22 35 19 28Q17 25 15 27Z"
-        fill="#2b1a12"
-      />
-      <rect x="21" y="30" width="4" height="10" rx="2" fill="#fff" opacity=".35" />
+      <path d="M11 17H53L32 58Z" fill="#f2b632" stroke="#f2b632" strokeWidth="4" strokeLinejoin="round" />
+      <rect x="6" y="6" width="52" height="13" rx="6.5" fill="#d9a066" />
+      <circle cx="24" cy="27" r="5" fill="#c0351b" />
+      <circle cx="40" cy="28" r="4.5" fill="#c0351b" />
+      <circle cx="32" cy="41" r="4" fill="#c0351b" />
+      <rect x="12" y="9" width="14" height="3" rx="1.5" fill="#fff" opacity=".35" />
     </svg>
   );
 }

@@ -216,7 +216,7 @@ function SeccionSabor({
       <details className="agregar">
         <summary>+ Agregar producto a {sabor.nombre}</summary>
         <FormAccion accion={crearProducto} ocultos={{ sabor_id: sabor.id }} className="fila">
-          <input name="nombre" placeholder="Nombre (ej. Paleta)" aria-label="Nombre del producto" required minLength={2} maxLength={60} />
+          <input name="nombre" placeholder="Nombre (ej. Grande)" aria-label="Nombre del producto" required minLength={2} maxLength={60} />
           <span className="campo-pesos">
             <span aria-hidden>$</span>
             <input name="precio" placeholder="Precio" aria-label="Precio en pesos" inputMode="numeric" required />

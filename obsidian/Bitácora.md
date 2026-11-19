@@ -1,6 +1,6 @@
 ---
 tipo: bitacora
-actualizado: 2026-11-16
+actualizado: 2026-11-19
 ---
 
 # Bitácora
@@ -57,3 +57,25 @@ actualizado: 2026-11-16
   - Verificación: 50 pruebas (10 nuevas), typecheck, prueba de humo 30/30 (el paso nuevo falló contra el código viejo con 500 y pasó después) y recorrido en Chrome contra `wrangler dev` local: crear productos, "+" dos veces rápido = +2, red cortada → error en línea sin tirar la página, foto de 1200×900 → 320×240 WebP, quitar foto, elección que sobrevive a la recarga, agotarse con la hoja abierta (se cierra y no se reabre), pedido #7 con confirmación, Preparado → Entregado → Deshacer, y sesión cerrada en otra pestaña → "+" manda a ingresar. Sin errores en consola.
   - Datos de prueba solo en la D1 **local**: "Paleta Prueba A/B/C" en Oreo, pedido #7 de "Cliente Prueba" y lo que deja la prueba de humo.
   - El `wrangler dev` de esta sesión (puerto 8790) se cerró al terminar. Sigue corriendo uno viejo en el 8787 que no es de esta sesión.
+- Pedido 8: merge de `ux-ui` en `main`. Antes, commit de lo del pedido 7 en `ux-ui` (`9ab36eb`); el usuario eligió eso en vez de dejarlo afuera. Hubo conflictos solo en `Bitácora.md` y `Pedidos del usuario.md` (las dos ramas agregaban una sesión en el mismo lugar): se resolvieron con la versión de `ux-ui`, que ya tenía textual lo de `main`. Merge `f664212`. El árbol quedó igual a `ux-ui` salvo `package-lock.json`, que trae el cambio de `main`. Verificado en `main`: 50 pruebas y typecheck. No se hizo push: `main` está 13 commits adelante de `origin/main`.
+- Pedido 9: preparar la subida a producción en el dominio actual (`la-paleteria.lavadito.workers.dev`).
+  - Menor arreglado: `leerFotoDataUrl` (`lib/foto.ts`) devuelve null si el base64 tiene largo o relleno inválido (antes `atob` tiraba y la acción terminaba en "No se pudo guardar…"); ahora sale "Elegí una foto (JPG, PNG o WebP)". Prueba nueva en `tests/foto.test.ts` (falló antes del arreglo).
+  - Menor revisado: ninguna acción llama a `haySesion()` antes de `iniciarSesion()`/`cerrarSesion()`. Queda solo la nota en `lib/sesion.ts`.
+  - Verificado: 51 pruebas, typecheck, `opennextjs-cloudflare build` y prueba de humo 30/30 en `wrangler dev` local (puerto 8791, cerrado al terminar).
+  - Wrangler no tiene sesión en esta máquina (no hay `CLOUDFLARE_API_TOKEN` ni login): el deploy espera `npx wrangler login`.
+
+## Sesión 4: 2026-11-19 (nace La Pizzería)
+- Pedido 10: copia de La Paletería para un emprendimiento de pizzas, con la misma lógica. Todo lo de arriba de esta sesión es la historia de La Paletería, que se hereda.
+- Copia con la historia de git (fork local), en `$Dev/la-pizzeria`. Remoto `upstream` = repo de La Paletería, para traer arreglos del sistema.
+- Se trajo también el arreglo de `leerFotoDataUrl` (`lib/foto.ts` + prueba) que en La Paletería estaba sin commitear.
+- Cambios (solo marca y datos, la lógica es la misma):
+  - Nombre "La Pizzería" (layout, página, `lib/datos.ts`, ajustes iniciales, prueba de humo); textos "paleta/s" → "pizza/s"; claves de navegador `pizzeria:*`.
+  - Sabores iniciales: Muzzarella, Napolitana, Fugazzeta, Calabresa, Jamón y morrones, Cuatro quesos (`migrations/0001_datos_iniciales.sql`; cambiados en el pedido 12). Producto de ejemplo: "Grande".
+  - Logo `app/LogoPizza.tsx` (porción con pepperoni) y `public/icon.svg`; `og.png`, `apple-touch-icon.png` y `favicon.ico` regenerados con Edge sin ventana.
+  - Color de acento: tomate (`#c0351b` claro, `#ff8a5c` oscuro), contrastes AA verificados (4,73 a 8,28).
+  - `wrangler.jsonc`: Worker/D1 `la-pizzeria`, R2 `la-pizzeria-imagenes`, `database_id` de relleno (ceros), rate limiters 2101/2102 para no compartir contadores con La Paletería.
+  - `.dev.vars` local con clave y secreto nuevos (no van al repo).
+- Verificación: 51 pruebas, typecheck, build de OpenNext y prueba de humo de 30 pasos en verde contra `wrangler dev` local.
+- Nada creado en Cloudflare: falta D1, R2, secretos y deploy (ver [[Pendientes]]).
+- Pedido 11: levantada en local con `npm run dev -- --port 3010` (D1 local reiniciada y 7 productos de ejemplo cargados a mano, no van en las migraciones). Hubo que matar un `wrangler dev` de la prueba de humo que había quedado colgado y tenía tomada la D1 local.
+- Pedido 12: sabores iniciales reducidos a **Muzza, Pepperoni, Fugazzeta y Roquefort**. Cambiado en `migrations/0001_datos_iniciales.sql` (sin publicar todavía, así que se editó la migración en vez de agregar una nueva) y en la D1 local (renombrados; los dos sobrantes y sus productos de ejemplo se borraron, no había pedidos).

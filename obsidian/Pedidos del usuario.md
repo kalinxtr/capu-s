@@ -1,6 +1,6 @@
 ---
 tipo: pedidos-crudos
-actualizado: 2026-11-16
+actualizado: 2026-11-19
 ---
 
 # Pedidos del usuario (crudos, tal cual)
@@ -69,3 +69,36 @@ Avanza hasta que queden los cambios listos para mergear a main, si necesitas che
 continua
 ```
 → [[Auditoría arquitectura frontend]] (7 hallazgos) y [[Plan arquitectura frontend]] (6 tareas), implementado en la rama `ux-ui`. Ver [[Bitácora]].
+
+### 8
+```
+mergea a contra main la rama
+```
+→ Con autorización del usuario: commit de lo de hoy en `ux-ui` (`9ab36eb`) y merge de `ux-ui` en `main` (`f664212`). Sin push.
+
+### 9
+```
+resolve los pendientes para subir a produccion con el dominio actual.
+```
+→ Producción = `la-paleteria.lavadito.workers.dev` (el dominio actual). Arreglo de la foto con base64 inválido, build y prueba de humo en local; el deploy espera el login de Cloudflare en esta máquina. Ver [[Bitácora]].
+
+## Sesión 4: 2026-11-19
+
+### 10
+```
+forkea este repositorio, y copialo para un emprendimiento de pizzas, es decir toda la sistematica es igual.
+Subilo a un repositorio privado. Crea el folder en /$Dev
+```
+→ Nació este proyecto: copia de La Paletería (con su historia de git) en `$Dev/la-pizzeria`, adaptada a pizzas. Ver [[Bitácora]].
+
+### 11
+```
+LEVANTAMELO EN LOCAL PARA PROBARLO
+```
+→ `next dev` en http://localhost:3010 con productos de ejemplo. Ver [[Bitácora]].
+
+### 12
+```
+dejame solamente las categorias de muzza, peperoni, ugazzeta y roquefort
+```
+→ Sabores: Muzza, Pepperoni, Fugazzeta y Roquefort (se corrigió la ortografía de "peperoni" y "ugazzeta"). Ver [[Bitácora]].

@@ -7,7 +7,7 @@ import { mensajeAlLocal } from "@/lib/mensajes";
 import { pasosDelPedido, textoEstadoCliente } from "@/lib/pedido";
 import { NOMBRE_ESTADO } from "@/lib/tipos";
 import { CompartirLink, LimpiarBorrador, Refrescar } from "../../compartidos";
-import { LogoPaleta } from "../../LogoPaleta";
+import { LogoPizza } from "../../LogoPizza";
 
 export async function generateMetadata({ params }: PageProps<"/pedido/[token]">): Promise<Metadata> {
   const { token } = await params;
@@ -30,7 +30,7 @@ export default async function VerPedido({ params, searchParams }: PageProps<"/pe
     <main className="publico">
       <header className="cabecera cabecera-chica">
         <Link href="/" className="marca">
-          <LogoPaleta tamano={32} />
+          <LogoPizza tamano={32} />
           <span className="marca-nombre">{ajustes.nombre_local}</span>
         </Link>
       </header>

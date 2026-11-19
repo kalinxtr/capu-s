@@ -45,7 +45,7 @@ export function leerPedido(
     if (cantidad > 0) lineas.push({ productoId: Number(m[1]), cantidad });
   }
 
-  if (!lineas.length) return { ok: false, error: "Elegí al menos una paleta." };
+  if (!lineas.length) return { ok: false, error: "Elegí al menos una pizza." };
   if (lineas.length > MAX_ITEMS) return { ok: false, error: "Son demasiados productos para un pedido." };
 
   const nombre = texto(campos.get("nombre"));

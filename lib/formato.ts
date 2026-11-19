@@ -66,7 +66,7 @@ export function linkMapa(direccion: string): string {
 
 /** Origen absoluto del sitio a partir del header Host (para links y la imagen para compartir). */
 export function origenSitio(host: string | null): string {
-  if (!host) return "https://la-paleteria.lavadito.workers.dev";
+  if (!host) return "https://la-pizzeria.lavadito.workers.dev";
   return /^(localhost|127\.0\.0\.1)(:|$)/.test(host) ? `http://${host}` : `https://${host}`;
 }
 

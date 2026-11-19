@@ -1,28 +1,21 @@
 ---
 tipo: indice
-actualizado: 2026-11-16
+actualizado: 2026-11-19
 ---
 
-# La Paletería: notas del proyecto
+# La Pizzería: notas del proyecto
 
-App para un negocio de paletas heladas: una **página pública de pedidos** (listado de stock por sabor) y un **admin** con secciones de Pedidos y Stock. Copia la lógica de flujo de [Lavadito-app](../../Lavadito-app/obsidian/Inicio.md) (reserva pública + admin).
+App para un emprendimiento de pizzas: una **página pública de pedidos** (listado de stock por sabor) y un **admin** con secciones de Pedidos y Stock. **Es una copia de La Paletería** (`$Dev/la-paleteria`, remoto `upstream`) con la misma lógica: solo cambian la marca, los colores, el logo y los sabores iniciales (pedido 10).
+
+Las notas de abajo (salvo [[Inicio]], [[Pendientes]] y la última sesión de [[Bitácora]]) son **heredadas de La Paletería**: donde dicen "paleta", acá es "pizza". Las reglas de [[Decisiones]] valen igual.
 
 **Para retomar, leé en este orden:**
-1. [[Pendientes]]: qué falta y en qué quedó lo último.
-2. [[Decisiones]]: reglas de negocio confirmadas (mandan sobre el brief).
+1. [[Pendientes]]: qué falta.
+2. [[Decisiones]]: reglas de negocio (mandan sobre el brief).
 3. [[Pedidos del usuario]]: cada pedido textual, crudo.
 4. [[Bitácora]]: qué se hizo en cada sesión.
-5. [[Brief original]]: la sinopsis inicial, cruda.
-6. [[Mapeo desde Lavadito]]: qué se reutiliza de Lavadito y cómo se traduce.
-7. [[Stack]]: propuesta de tecnologías.
-8. [[Diseño]]: diseño v1 (qué se construye).
-9. [[Reporte UX-UI]] y [[Plan UX-UI]]: mejoras de la sesión 2 (rama `ux-ui`).
-10. [[Auditoría arquitectura frontend]] y [[Plan arquitectura frontend]]: arquitectura del frontend (pedido 7, rama `ux-ui`).
+5. Heredadas: [[Brief original]], [[Mapeo desde Lavadito]], [[Stack]], [[Diseño]], [[Reporte UX-UI]], [[Plan UX-UI]], [[Auditoría arquitectura frontend]], [[Plan arquitectura frontend]].
 
-**Estado actual (2026-11-13):** **v1 construida y publicada en un entorno de prueba**: https://la-paleteria.lavadito.workers.dev (admin en `/admin`). Base D1 `la-paleteria` (vacía: solo los 6 sabores), fotos en R2 `la-paleteria-imagenes`. Prueba de humo de 25 pasos en verde, en local y publicada. Falta que el usuario la pruebe y cargue sus productos.
-
-**2026-11-14:** mejoras UX/UI hechas en la rama `ux-ui`, sin publicar todavía (prueba de humo ahora de 29 pasos). Ver [[Pendientes]].
-
-**2026-11-16:** auditoría de arquitectura frontend hecha e implementada en `ux-ui` (sesión vencida → ingresar, `useAccion`, fotos a 320 px, módulos del admin por tema). 50 pruebas, prueba de humo de 30 pasos y recorrido en Chrome en verde. Ver [[Pendientes]].
+**Estado actual (2026-11-19):** copia adaptada y probada en local (51 pruebas, prueba de humo de 30 pasos). **Sin publicar**: todavía no existen la D1, el R2 ni el Worker en Cloudflare. Ver [[Pendientes]].
 
 Comandos, deploy y trampas: `README.md` en la raíz del repo.

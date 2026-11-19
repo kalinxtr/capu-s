@@ -14,6 +14,11 @@ describe("leerFotoDataUrl", () => {
     expect(leerFotoDataUrl("data:image/webp;base64,@@@")).toBeNull();
     expect(leerFotoDataUrl("")).toBeNull();
   });
+
+  it("rechaza base64 de largo inválido sin tirar", () => {
+    expect(leerFotoDataUrl("data:image/png;base64,iVBOR")).toBeNull();
+    expect(leerFotoDataUrl("data:image/png;base64,iVBORw0KGgo==")).toBeNull();
+  });
 });
 
 describe("medidaAchicada", () => {

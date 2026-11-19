@@ -9,7 +9,7 @@ import { leerPedido, type CampoPedido } from "@/lib/pedido";
 /** Solo vuelve algo si falló: si sale bien, redirige al link del pedido (que es la confirmación). */
 export type ResultadoPedido = { ok: false; error: string; campo?: CampoPedido } | null;
 
-const AGOTADO = "Alguna paleta se agotó mientras elegías. Ya actualizamos la lista: revisá y volvé a pedir.";
+const AGOTADO = "Alguna pizza se agotó mientras elegías. Ya actualizamos la lista: revisá y volvé a pedir.";
 
 /**
  * Crea el pedido y descuenta el stock en un solo batch de D1 (atómico).

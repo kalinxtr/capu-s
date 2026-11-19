@@ -7,7 +7,7 @@ import type { Ajustes, EstadoPedido, Pedido, PedidoItem, Producto, Sabor } from 
 
 export async function leerAjustes(DB: D1Database): Promise<Ajustes> {
   const a = await DB.prepare("SELECT nombre_local, whatsapp, texto_retiro FROM ajustes WHERE id = 1").first<Ajustes>();
-  return a ?? { nombre_local: "La Paletería", whatsapp: null, texto_retiro: null };
+  return a ?? { nombre_local: "La Pizzería", whatsapp: null, texto_retiro: null };
 }
 
 /** Sabores y productos. Sin `todos`, solo lo activo (para la página pública). */

@@ -1,9 +1,9 @@
-# La Paletería
+# La Pizzería
 
-Pedidos de paletas heladas: una **página pública** con el stock por sabor (sin stock = deshabilitado) y un **admin** con Pedidos y Stock. Copia la lógica de flujo de Lavadito-app.
+Pedidos de pizzas: una **página pública** con el stock por sabor (sin stock = deshabilitado) y un **admin** con Pedidos y Stock. Es una copia de [La Paletería](https://github.com/kalinxtr/la-paleteria) (remoto `upstream`) con la misma lógica: solo cambian la marca, los colores y los sabores iniciales.
 
 - **Stack:** Next.js 16 (App Router + Server Actions) en Cloudflare Workers con `@opennextjs/cloudflare`, base **D1** (SQLite) e imágenes en **R2**.
-- **Entorno de prueba:** https://la-paleteria.lavadito.workers.dev (admin en `/admin`).
+- **Entorno de prueba:** todavía no está publicado. Ver "Primer deploy" abajo.
 - Notas del proyecto, decisiones y bitácora: `obsidian/` (empezar por `obsidian/Inicio.md`).
 
 ## Rutas
@@ -41,6 +41,18 @@ node scripts/humo.mjs http://localhost:8787 <clave-admin>
 ```
 
 Crea un producto "Prueba …" en el sabor 1 y pedidos de "Cliente Prueba". Contra el entorno publicado, borrarlos después.
+
+## Primer deploy (una sola vez)
+
+La D1 y el bucket R2 de este proyecto todavía no existen en Cloudflare. `wrangler.jsonc` tiene un `database_id` de relleno (todo ceros).
+
+```bash
+npx wrangler d1 create la-pizzeria          # copiar el database_id que devuelve a wrangler.jsonc
+npx wrangler r2 bucket create la-pizzeria-imagenes
+npm run cf-typegen
+```
+
+Después, lo de "Deploy" y los dos secretos. Los rate limiters usan los `namespace_id` 2101 y 2102 (La Paletería usa 2001 y 2002) para no compartir contadores.
 
 ## Deploy
 

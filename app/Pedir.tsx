@@ -15,7 +15,7 @@ export function Pedir({ secciones, textoRetiro }: { secciones: Seccion[]; textoR
   const [anuncio, setAnuncio] = useState("");
 
   const productos = useMemo(() => secciones.flatMap((s) => s.productos), [secciones]);
-  /** "Oreo · Paleta": el nombre solo ("Paleta") se repite entre sabores. */
+  /** "Muzza · Grande": el nombre solo ("Grande") se repite entre sabores. */
   const completo = useMemo(
     () => new Map(secciones.flatMap((s) => s.productos.map((p) => [p.id, `${s.nombre} · ${p.nombre}`] as const))),
     [secciones],
@@ -134,7 +134,7 @@ export function Pedir({ secciones, textoRetiro }: { secciones: Seccion[]; textoR
       {unidades > 0 && (
         <div className="barra">
           <span className="barra-total">
-            {unidades} {unidades === 1 ? "paleta" : "paletas"} · <strong>{pesos(total)}</strong>
+            {unidades} {unidades === 1 ? "pizza" : "pizzas"} · <strong>{pesos(total)}</strong>
           </span>
           <button type="button" className="boton-principal" onClick={() => setAbierto(true)} aria-haspopup="dialog">
             Pedir

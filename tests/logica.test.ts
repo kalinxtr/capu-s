@@ -29,7 +29,7 @@ describe("leerPedido", () => {
   });
 
   it("pide al menos un producto", () => {
-    expect(leerPedido([...base, ["cant_1", "0"]])).toEqual({ ok: false, error: "Elegí al menos una paleta." });
+    expect(leerPedido([...base, ["cant_1", "0"]])).toEqual({ ok: false, error: "Elegí al menos una pizza." });
   });
 
   it("rechaza cantidades negativas, decimales o enormes", () => {
@@ -75,12 +75,12 @@ describe("textoPedido", () => {
       nota: "Sin timbre",
       total: 7500,
       items: [
-        { nombre: "Oreo · Paleta", cantidad: 2, precio: 2500 },
-        { nombre: "Dubai · Paleta", cantidad: 1, precio: 2500 },
+        { nombre: "Muzzarella · Grande", cantidad: 2, precio: 2500 },
+        { nombre: "Napolitana · Grande", cantidad: 1, precio: 2500 },
       ],
     });
     expect(t).toBe(
-      "Pedido #7 · Ana\n• 2 × Oreo · Paleta ($ 5.000)\n• 1 × Dubai · Paleta ($ 2.500)\nTotal: $ 7.500\nEnvío a: Calle 123\nNota: Sin timbre",
+      "Pedido #7 · Ana\n• 2 × Muzzarella · Grande ($ 5.000)\n• 1 × Napolitana · Grande ($ 2.500)\nTotal: $ 7.500\nEnvío a: Calle 123\nNota: Sin timbre",
     );
   });
 });

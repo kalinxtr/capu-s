@@ -1,6 +1,6 @@
 ---
 tipo: decisiones
-actualizado: 2026-11-14
+actualizado: 2026-11-19
 ---
 
 # Decisiones y reglas de negocio
@@ -57,5 +57,12 @@ actualizado: 2026-11-14
 - **Pedidos nuevos**: número en la pestaña "(2) Pedidos" y en la barra; las tarjetas nuevas desde la última visita se marcan. Sin sonido.
 - **Avisos flotantes** que se van solos; al marcar Preparado/Entregado traen "Deshacer".
 
+## La Pizzería (pedido 10)
+- **Misma sistemática que La Paletería**: todas las reglas de arriba valen igual; donde dicen "paleta", acá es "pizza".
+- **Tomadas en la copia (corregibles):** nombre "La Pizzería"; color de acento tomate; logo de una porción con pepperoni.
+
+- **Sabores (categorías) iniciales: Muzza, Pepperoni, Fugazzeta y Roquefort** (pedido 12, confirmado por el usuario).
+
 ## Abiertas (ver [[Pendientes]])
 - Clave definitiva del admin.
+- Nombre definitivo del negocio.

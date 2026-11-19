@@ -58,7 +58,7 @@ export default async function Pedidos({ searchParams }: PageProps<"/admin/pedido
       {produccion.length > 0 && (
         <details className="tarjeta a-preparar" open>
           <summary>
-            Para preparar · {produccion.reduce((t, x) => t + x.cantidad, 0)} paletas de {nuevos.length}{" "}
+            Para preparar · {produccion.reduce((t, x) => t + x.cantidad, 0)} pizzas de {nuevos.length}{" "}
             {nuevos.length === 1 ? "pedido nuevo" : "pedidos nuevos"}
           </summary>
           <ul className="resumen">

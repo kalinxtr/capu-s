@@ -18,7 +18,13 @@ export function leerFotoDataUrl(
   const m = /^data:(image\/(?:webp|jpeg|png));base64,([A-Za-z0-9+/]+=*)$/.exec(valor);
   if (!m) return null;
   const tipo = m[1] as TipoFoto;
-  return { tipo, ext: TIPOS_FOTO[tipo], bytes: Uint8Array.from(atob(m[2]), (c) => c.charCodeAt(0)) };
+  let binario: string;
+  try {
+    binario = atob(m[2]);
+  } catch {
+    return null; // Largo o relleno inválido: atob tira.
+  }
+  return { tipo, ext: TIPOS_FOTO[tipo], bytes: Uint8Array.from(binario, (c) => c.charCodeAt(0)) };
 }
 
 /** Medidas para achicar una foto a `lado` px de lado mayor, sin agrandarla y sin dejar un lado en 0. */

@@ -1,6 +1,6 @@
 @AGENTS.md
 
-# La Paletería
+# La Pizzería
 
 Antes de trabajar, leé el vault de Obsidian en `obsidian/`, empezando por `obsidian/Inicio.md`. Tiene las decisiones del usuario (mandan sobre todo lo demás), los pedidos textuales, el diseño y la bitácora.
 

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { CLAVE_ELECCION, leerEleccion, recortarEleccion, type Eleccion, type Recorte } from "@/lib/eleccion";
 
-/** `nombre` es el completo ("Oreo · Paleta"): es el que se usa en los avisos de recorte. */
+/** `nombre` es el completo ("Muzza · Grande"): es el que se usa en los avisos de recorte. */
 type Elegible = { id: number; nombre: string; stock: number };
 
 /**
