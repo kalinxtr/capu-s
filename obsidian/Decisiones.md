@@ -59,10 +59,10 @@ actualizado: 2026-11-19
 
 ## La Pizzería (pedido 10)
 - **Misma sistemática que La Paletería**: todas las reglas de arriba valen igual; donde dicen "paleta", acá es "pizza".
-- **Tomadas en la copia (corregibles):** nombre "La Pizzería"; color de acento tomate; logo de una porción con pepperoni.
+- **Nombre del negocio: Capu's** (pedido 17, confirmado por el usuario).
+- **Tomadas en la copia (corregibles):** color de acento tomate; logo de una porción con pepperoni.
 
 - **Sabores (categorías) iniciales: Muzza, Pepperoni, Fugazzeta y Roquefort** (pedido 12, confirmado por el usuario).
 
 ## Abiertas (ver [[Pendientes]])
 - Clave definitiva del admin.
-- Nombre definitivo del negocio.

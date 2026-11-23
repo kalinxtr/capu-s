@@ -84,7 +84,7 @@ cookie = (buena.setCookie ?? "").split(";")[0];
 check(cookie.startsWith("sesion="), "Clave correcta da la cookie de sesión");
 
 // ── Stock
-const aj = await accion("guardarAjustes", "/admin/stock", { nombre_local: "La Pizzería", whatsapp: "11 2345 6789", texto_retiro: "Retiro de 14 a 20 h" });
+const aj = await accion("guardarAjustes", "/admin/stock", { nombre_local: "Capu's", whatsapp: "11 2345 6789", texto_retiro: "Retiro de 14 a 20 h" });
 check(aj.ok, "Se guardan los datos del local", aj.error);
 const cp = await accion("crearProducto", "/admin/stock", { sabor_id: "1", nombre, precio: "$2.500", stock: "3" });
 check(cp.ok, "Se crea un producto con stock 3", cp.error);

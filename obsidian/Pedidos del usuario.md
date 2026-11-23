@@ -123,3 +123,9 @@ reseteame el login
 volve a lanzar el login
 ```
 → Logout y login de nuevo; quedó la cuenta de La Paletería (`lavadito.workers.dev`). Con eso se siguió con el pedido 14: ver [[Bitácora]] (pedido 16 en la bitácora = el deploy).
+
+### 17
+```
+Cambia toda referencia a la-pizzeria en el frontend, por "Capu's".
+```
+→ El nombre del negocio pasa a ser **Capu's**. Ver [[Bitácora]].

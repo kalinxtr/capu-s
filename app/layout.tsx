@@ -13,7 +13,7 @@ const fraunces = Fraunces({
 
 // Sin D1 acá: el layout raíz también envuelve páginas que Next prerenderiza en el build.
 export const metadata: Metadata = {
-  title: { default: "La Pizzería", template: "%s · La Pizzería" },
+  title: { default: "Capu's", template: "%s · Capu's" },
   description: "Pizzas: mirá qué hay y hacé tu pedido.",
   icons: { icon: [{ url: "/favicon.ico", sizes: "48x48" }, { url: "/icon.svg", type: "image/svg+xml" }], apple: "/apple-touch-icon.png" },
   twitter: { card: "summary_large_image" },

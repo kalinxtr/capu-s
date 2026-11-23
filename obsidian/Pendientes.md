@@ -9,7 +9,7 @@ actualizado: 2026-11-19
 Ver [[Bitácora]] → sesión 4.
 
 ## 2. Lo que falta (del usuario)
-- [ ] **Confirmar el nombre del negocio.** Hoy es "La Pizzería" (layout, ajustes iniciales, imagen para compartir). El nombre visible se cambia desde Stock → datos del local; si cambia, regenerar `public/og.png`.
+- [x] Nombre del negocio: **Capu's** (pedido 17). En el código, la imagen para compartir y la D1 local. **Falta publicarlo:** `npm run db:remota` (migración 0002) y `npm run deploy`.
 - [x] Sabores iniciales: Muzza, Pepperoni, Fugazzeta y Roquefort (pedido 12).
 - [x] Publicada en Cloudflare (pedido 16): https://la-pizzeria.lavadito.workers.dev.
 - [ ] **Cambiar la clave del admin** si se quiere una propia: `! npx wrangler secret put ADMIN_CLAVE` (corta las sesiones abiertas). La actual se le pasó al usuario en la conversación.

@@ -88,3 +88,10 @@ actualizado: 2026-11-19
   - Prueba de humo de 30 pasos contra lo publicado: en verde (se corrió dos veces por error). Después se borraron sus datos: 2 pedidos de prueba con sus ítems, 2 productos "Prueba", sus 2 fotos en R2, el contador de pedidos (el primero real será el #1) y el WhatsApp/retiro falsos de los ajustes.
   - Verificado: `/` 200, `/admin/ingresar` 200, `/no-existe` 404, `og.png` e `icon.svg` 200.
   - Como cambió el `database_id`, la D1 local también es otra: se le aplicaron las migraciones y los 5 productos de ejemplo, así `npm run dev` sigue igual al reiniciarse.
+- Pedido 17: nombre del negocio → **Capu's** en todo lo visible (el pedido se hizo desde una sesión abierta en `la-paleteria`; La Paletería no se tocó).
+  - `app/layout.tsx` (título y plantilla "… · Capu's"), `lib/datos.ts` (nombre por defecto), comentario de `app/globals.css` y la prueba de humo.
+  - Migración nueva `0002_nombre_capus.sql`: cambia `nombre_local` a "Capu's" solo si sigue siendo "La Pizzería" (la 0001 ya está aplicada en la remota, por eso no se editó). Aplicada en la D1 **local**; en la remota **no**.
+  - `public/og.png` regenerada con Edge sin ventana (mismo diseño, 28 KB).
+  - Sin cambiar a propósito (no se ven como marca): el dominio `la-pizzeria.lavadito.workers.dev`, los nombres del Worker/D1/R2 y las claves del navegador `pizzeria:*` (cambiarlas borraría los datos guardados de los clientes).
+  - Verificado: 51 pruebas, typecheck, build de OpenNext, `/` y el 404 con título y `<h1>` "Capu's", prueba de humo 30/30 en `wrangler dev` local (puerto 8793, cerrado al terminar). Dejó datos de prueba en la D1 local.
+  - Sin publicar: falta `npm run db:remota` y `npm run deploy`.
