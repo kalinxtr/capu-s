@@ -1,6 +1,6 @@
 ---
 tipo: pedidos-crudos
-actualizado: 2026-11-19
+actualizado: 2026-11-23
 ---
 
 # Pedidos del usuario (crudos, tal cual)
@@ -129,3 +129,75 @@ volve a lanzar el login
 Cambia toda referencia a la-pizzeria en el frontend, por "Capu's".
 ```
 → El nombre del negocio pasa a ser **Capu's**. Ver [[Bitácora]].
+
+### 18
+```
+aplicá la migración remota y deployá
+```
+→ Migración 0002 en la D1 remota y deploy: Capu's quedó publicado. Ver [[Bitácora]].
+
+### 19
+```
+Acabo de dejar una imagen en el path actual. Necesito que extraigas el fondo de pantalla de esa publicacion.
+Arma una imagen para fondo que sea utilizable en el background de la pagina en donde se hacen los pedidos
+```
+→ Mosaico repetible `public/fondo-capus.webp` armado con los logos del fondo de la publicación. No se aplicó a la página todavía. Ver [[Bitácora]].
+
+### 20
+```
+aplicalo a la página de pedidos con una capa oscura
+```
+→ La página de pedidos (`/`) pasa a ser siempre oscura, con el fondo de logos detrás y una capa oscura encima. Ver [[Bitácora]].
+
+### 21
+```
+Bien. Ahora, en base a la imagen principal, extrae el logo, y colocalo en donde sea apropiado.
+```
+→ Logo de Capu's recortado de la publicación (`public/logo-capus.webp`) y puesto en la cabecera de la página de pedidos, el link del pedido, el 404, el ingreso al admin y la imagen para compartir (`og.png`). Ver [[Bitácora]].
+
+### 22
+```
+Audita los cambios y deploya
+```
+→ Diff revisado sin errores; publicado (versión `33044aa9`). Ver [[Bitácora]].
+
+### 23
+```
+Hola claude, planifica implementar notificaciones de pedidos al dueño.
+Usa free tier.
+```
+→ Se relevó cómo se entera hoy el dueño (solo con el admin abierto o si el cliente toca "Avisar por WhatsApp") y las opciones gratis. Ver [[Bitácora]].
+
+### 24
+```
+Mail
+```
+→ Elegido el canal: mail. Se propuso Resend (gratis) y se descartó el mail de Cloudflare (pide dominio propio).
+
+### 25
+```
+Setea la infraestructura con todo lo que puedas hacer automaticamente, no mergees, levanta rama nueva de la feat y al finalizar los cambios del agente. usa claude in chrome para configurar resend si es necesario.
+```
+Respuestas en el camino:
+- Destino de los avisos: "A cualquier mail, vía nextstarting".
+- Mail: "setealo con cualquiera de los 2, pero dejalo modular para cambiarlo por el del cliente, para testing first"
+
+→ Aviso por mail de pedido nuevo con Resend, en la rama `feat/aviso-pedidos-mail`. Ver [[Bitácora]].
+
+### 26
+```
+ya esta la env
+```
+→ Verificado: el Worker tiene `RESEND_CLAVE` y `AVISO_MAIL`. Falta publicar el código de la rama.
+
+### 27
+```
+Proba el flujo contra mi mail, yo te reporto si me llega algo y si hay que modificarlo.
+```
+→ Publicada la rama (versión `1c20bfe1`) y un pedido de prueba: Resend lo marcó "Delivered" a `nehuenxtreem6@gmail.com`. Datos de prueba borrados. Ver [[Bitácora]].
+
+### 28
+```
+Audita la calidad de los cambios y si esta todo bien pushealos a produccion y ramas principales.
+```
+→ Auditado (dos detalles corregidos), commiteado, mergeado a `main`, pusheado y publicado. Ver [[Bitácora]].

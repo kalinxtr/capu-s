@@ -1,9 +1,13 @@
 "use server";
 
 import { refresh } from "next/cache";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
+import { avisarPorMail } from "@/lib/aviso";
 import { db, env, excedido, ipCliente } from "@/lib/cloudflare";
-import { normalizarTelefono } from "@/lib/formato";
+import { normalizarTelefono, origenSitio } from "@/lib/formato";
+import { mailPedidoNuevo } from "@/lib/mensajes";
 import { leerPedido, type CampoPedido } from "@/lib/pedido";
 
 /** Solo vuelve algo si falló: si sale bien, redirige al link del pedido (que es la confirmación). */
@@ -22,7 +26,7 @@ export async function crearPedido(_prev: ResultadoPedido, form: FormData): Promi
   if (!leido.ok) return leido;
   const d = leido.datos;
 
-  const { LIMITE_PEDIDOS } = await env();
+  const { LIMITE_PEDIDOS, RESEND_CLAVE, AVISO_MAIL, AVISO_REMITENTE } = await env();
   if (await excedido(LIMITE_PEDIDOS, await ipCliente())) {
     return { ok: false, error: "Hiciste muchos pedidos seguidos. Esperá un minuto y probá de nuevo." };
   }
@@ -55,8 +59,9 @@ export async function crearPedido(_prev: ResultadoPedido, form: FormData): Promi
   const token = crypto.randomUUID();
   const ahora = Date.now();
 
+  let id: number;
   try {
-    await DB.batch([
+    const resultados = await DB.batch([
       DB.prepare(
         `INSERT INTO pedidos (token, cliente_nombre, cliente_telefono, entrega, direccion, nota, total, estado, creado, actualizado)
          VALUES (?, ?, ?, ?, ?, ?, ?, 'nuevo', ?, ?)`,
@@ -69,6 +74,7 @@ export async function crearPedido(_prev: ResultadoPedido, form: FormData): Promi
         ).bind(i.productoId, i.nombre, i.precio, i.cantidad, token),
       ]),
     ]);
+    id = resultados[0].meta.last_row_id;
   } catch (e) {
     if (/CHECK constraint failed/i.test(mensajeDe(e))) {
       refresh();
@@ -76,6 +82,14 @@ export async function crearPedido(_prev: ResultadoPedido, form: FormData): Promi
     }
     throw e;
   }
+
+  // Aviso al dueño después de responder: el cliente no espera al mail y si falla el pedido ya quedó.
+  const linkAdmin = `${origenSitio((await headers()).get("host"))}/admin/pedidos`;
+  const mail = mailPedidoNuevo(
+    { id, cliente_nombre: d.nombre, cliente_telefono: normalizarTelefono(d.telefono), entrega: d.entrega, direccion: d.direccion, nota: d.nota, total, items },
+    linkAdmin,
+  );
+  after(() => avisarPorMail({ RESEND_CLAVE, AVISO_MAIL, AVISO_REMITENTE }, mail, `pedido-${token}`));
 
   // Fuera del try: redirect() funciona tirando una excepción especial.
   refresh();

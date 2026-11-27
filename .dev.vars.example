@@ -1,3 +1,6 @@
 # Copiar a .dev.vars para desarrollo local. En Cloudflare se cargan con `npx wrangler secret put`.
 ADMIN_CLAVE=una-clave-de-prueba
 SESION_SECRETO=al-menos-32-caracteres-al-azar-xxxxxxxx
+# Aviso por mail de pedidos nuevos (opcional; sin estas dos no se manda nada).
+# RESEND_CLAVE=re_xxxxxxxx
+# AVISO_MAIL=dueno@ejemplo.com

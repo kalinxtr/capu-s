@@ -1,6 +1,6 @@
 ---
 tipo: decisiones
-actualizado: 2026-11-19
+actualizado: 2026-11-26
 ---
 
 # Decisiones y reglas de negocio
@@ -60,9 +60,18 @@ actualizado: 2026-11-19
 ## La Pizzería (pedido 10)
 - **Misma sistemática que La Paletería**: todas las reglas de arriba valen igual; donde dicen "paleta", acá es "pizza".
 - **Nombre del negocio: Capu's** (pedido 17, confirmado por el usuario).
-- **Tomadas en la copia (corregibles):** color de acento tomate; logo de una porción con pepperoni.
+- **Tomadas en la copia (corregibles):** color de acento tomate; logo de una porción con pepperoni (desde el pedido 21 queda solo en los íconos chicos; en la app va el logo real de Capu's).
 
 - **Sabores (categorías) iniciales: Muzza, Pepperoni, Fugazzeta y Roquefort** (pedido 12, confirmado por el usuario).
 
 ## Abiertas (ver [[Pendientes]])
 - Clave definitiva del admin.
+
+## Pedido 20
+- **La página de pedidos (`/`) es siempre oscura**, con el fondo de logos de Capu's y una capa oscura encima (pedido del usuario). El resto de las páginas siguen la preferencia del celular.
+
+## Pedidos 23 a 25: aviso de pedido nuevo
+- **El dueño recibe un mail por cada pedido nuevo** (canal elegido por el usuario; plan gratis). Se manda con **Resend**.
+- **Remitente: `pedidos@nextstarting.com.ar`**, dominio de otro proyecto del usuario ya verificado en su cuenta de Resend (elegido por el usuario: así se puede escribir a cualquier dirección).
+- **Destino configurable sin tocar código** (pedido del usuario: "modular para cambiarlo por el del cliente"): secreto `AVISO_MAIL`, hoy `nehuenxtreem6@gmail.com` para probar. Acepta varios separados por coma.
+- Tomadas en la construcción (corregibles): el mail sale **después de responder** (`after`), así el cliente no espera y si el mail falla el pedido igual queda; sin clave o sin destino no se manda nada; solo se avisa el pedido nuevo (no los cambios de estado).

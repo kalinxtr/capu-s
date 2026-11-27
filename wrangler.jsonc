@@ -18,6 +18,11 @@
 			"migrations_dir": "migrations"
 		}
 	],
+	"vars": {
+		// Remitente del aviso de pedido nuevo. Tiene que ser de un dominio verificado en Resend
+		// (nextstarting.com.ar, de la cuenta del usuario). A quién llega: secreto AVISO_MAIL.
+		"AVISO_REMITENTE": "Capu's pedidos <pedidos@nextstarting.com.ar>"
+	},
 	"r2_buckets": [{ "binding": "IMAGENES", "bucket_name": "la-pizzeria-imagenes" }],
 	"ratelimits": [
 		// Pedidos públicos por IP y por minuto, para que nadie vacíe el stock con un script.

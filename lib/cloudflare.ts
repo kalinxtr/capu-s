@@ -9,6 +9,10 @@ export type Env = {
   LIMITE_INGRESO: RateLimit;
   ADMIN_CLAVE?: string;
   SESION_SECRETO?: string;
+  /** Aviso por mail de pedidos nuevos (opcionales: sin ellos no se manda nada). */
+  RESEND_CLAVE?: string;
+  AVISO_MAIL?: string;
+  AVISO_REMITENTE?: string;
 };
 
 /** Bindings de Cloudflare (D1, R2, rate limiters y secretos). */

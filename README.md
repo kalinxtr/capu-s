@@ -66,7 +66,17 @@ Secretos (una vez por entorno):
 ```bash
 npx wrangler secret put ADMIN_CLAVE      # clave del admin (cambiarla corta todas las sesiones)
 npx wrangler secret put SESION_SECRETO   # 32+ caracteres al azar
+npx wrangler secret put RESEND_CLAVE     # clave de Resend para el aviso de pedido nuevo (opcional)
+npx wrangler secret put AVISO_MAIL       # a quién le llega el aviso; varios separados por coma (opcional)
 ```
+
+### Aviso por mail de pedido nuevo
+
+Cada pedido nuevo le manda un mail al dueño con [Resend](https://resend.com) (plan gratis). Sale después de responder (`after` de Next): el cliente no espera y, si falla, el pedido igual queda y el error va a los logs del Worker. Sin `RESEND_CLAVE` o sin `AVISO_MAIL` no se manda nada (por eso en local y en la prueba de humo no salen mails).
+
+- Remitente: variable `AVISO_REMITENTE` en `wrangler.jsonc`. Tiene que ser de un dominio verificado en Resend (hoy `nextstarting.com.ar`). Sin dominio verificado, Resend solo deja mandar desde `onboarding@resend.dev` a la dirección de la propia cuenta.
+- Para cambiar a quién le llega: `npx wrangler secret put AVISO_MAIL` (sin redeployar).
+- La prueba de humo contra lo publicado manda un mail por cada pedido de prueba.
 
 ## Trampas conocidas
 

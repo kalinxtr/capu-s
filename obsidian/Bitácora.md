@@ -1,6 +1,6 @@
 ---
 tipo: bitacora
-actualizado: 2026-11-19
+actualizado: 2026-11-23
 ---
 
 # Bitácora
@@ -94,4 +94,63 @@ actualizado: 2026-11-19
   - `public/og.png` regenerada con Edge sin ventana (mismo diseño, 28 KB).
   - Sin cambiar a propósito (no se ven como marca): el dominio `la-pizzeria.lavadito.workers.dev`, los nombres del Worker/D1/R2 y las claves del navegador `pizzeria:*` (cambiarlas borraría los datos guardados de los clientes).
   - Verificado: 51 pruebas, typecheck, build de OpenNext, `/` y el 404 con título y `<h1>` "Capu's", prueba de humo 30/30 en `wrangler dev` local (puerto 8793, cerrado al terminar). Dejó datos de prueba en la D1 local.
-  - Sin publicar: falta `npm run db:remota` y `npm run deploy`.
+  - Publicado el 2026-11-23 (pedido 18): `npm run db:remota` aplicó la 0002 en la D1 remota (`nombre_local` quedó "Capu's") y `npm run deploy` subió la versión `a412e7c4`.
+  - Verificado en https://la-pizzeria.lavadito.workers.dev: `/` 200 con título y `<h1>` "Capu's", `/admin/ingresar` 200, `/no-existe` 404 ("No encontrada · Capu's"), `og.png` nueva (28 KB) e `icon.svg` 200; ningún "La Pizzería" en la home. No se corrió la prueba de humo contra lo publicado (no dejó datos de prueba).
+
+## Sesión 5: 2026-11-23
+- Pedido 19: fondo de la publicación de Instagram/WhatsApp (`WhatsApp Image 2026-11-19 at 22.55.51.jpeg`, raíz del repo, sin versionar) → imagen de fondo para la página de pedidos.
+  - El fondo original es negro con logos "Capu's" grises y trazos verde/rojo, tapado en el centro por la pizza, el logo y el título "MUZZARELLA"; no es una grilla exacta. Por eso no se "despegó" el fondo: se recortaron dos logos limpios (arriba a la izquierda, trazo verde, 300×220; arriba a la derecha, trazo rojo, 260×215), con bordes difuminados a negro y el ruido del JPEG llevado a negro puro, y se armó un **mosaico repetible sin cortes** de 620×460 en tresbolillo (mezcla "aclarar" sobre negro, con envoltura en los bordes).
+  - Resultado: `public/fondo-capus.webp` (23 KB). Revisado repetido 3×3: sin costuras.
+  - **No se aplicó a la página**: la home usa fondo crema claro (`--fondo: #fff7ef`), y un fondo negro cambia todo el look. Queda para cuando el usuario lo decida (ver [[Pendientes]]).
+  - Script de armado en el scratchpad de la sesión (no quedó en el repo); usa `sharp` de `node_modules`.
+- Pedido 20: fondo aplicado a la página de pedidos (`/`).
+  - `app/page.tsx`: `<main className="publico con-fondo">` y `viewport` propio (`colorScheme: "dark"`, `themeColor: "#0e0907"`, para la barra del navegador).
+  - `app/globals.css` (sección 7): `.con-fondo` fuerza los tokens del modo oscuro en esa página, aunque el celular esté en modo claro, porque el texto que va directo sobre el fondo (título, bajada, títulos de sabor) tiene que ser claro. **Repite los tokens de la sección 2: si se cambia uno allá, cambiarlo también acá.** El fondo va en `.con-fondo::before` (`position: fixed`, `z-index: -1`): mosaico a 413 px de ancho (nítido en pantallas 2×) con una capa `rgb(14 9 7 / 80%)` encima. No se usó `background-attachment: fixed` porque en iPhone no anda. `:root:has(.con-fondo)` oscurece lo que asoma al estirar la página y las barras de scroll.
+  - Solo `/`: la confirmación (`/pedido/<token>`), el 404, el error y el admin siguen con el tema de siempre.
+  - Verificado: 51 pruebas, typecheck, build de OpenNext, prueba de humo 30/30 en `wrangler dev` local (puerto 8794, cerrado al terminar; dejó datos de prueba en la D1 local) y capturas en 390×844 con el celular en modo claro: listado, barra y hoja del pedido, todo oscuro y legible.
+  - No publicado.
+- Pedido 21: logo de Capu's sacado de la publicación y puesto en la app.
+  - Recorte: el logo grande de arriba (chef + "Capu's" + "Pizzas a la Piedra" + ®). El fondo negro se quitó rellenando desde los bordes del recorte (máximo de canal < 72), con borde suave y color recuperado del negro; se descartaron las piezas sueltas (un logo gris del fondo y el borde de la bolsa de la pizza). Resultado: `public/logo-capus.webp`, 621×308 con transparencia, 47 KB. Se ve bien sobre fondo oscuro y sobre el crema.
+  - `app/LogoCapus.tsx` (`<img>` con ancho/alto fijos, para que no salte al cargar) reemplaza a `app/LogoPizza.tsx`, que se borró. Se sacó `.marca-nombre` del CSS (ya no se usaba).
+  - Dónde quedó:
+    - Página de pedidos (`/`): cabecera centrada (`.cabecera-logo`), logo de hasta 260 px dentro del `<h1>`, con `alt` = nombre del local (lo que se cargue en el admin). Se carga con prioridad.
+    - Link del pedido (`/pedido/<token>`): el logo a 104 px reemplaza al dibujo y al nombre; sigue siendo el link a `/`.
+    - 404 (160 px) e ingreso al admin (112 px).
+    - `public/og.png` (la imagen que muestra WhatsApp al compartir el link): fondo de logos + capa oscura + logo centrado, 1200×630, 206 KB (paleta de 256 colores). El `alt` de la imagen ahora es el nombre del local.
+  - **Sin cambiar**: `favicon.ico`, `icon.svg` y `apple-touch-icon.png` siguen con la porción de pizza; el logo completo no se lee a 16-48 px.
+  - Verificado: 51 pruebas, typecheck, build de OpenNext, prueba de humo 30/30 en `wrangler dev` local (puerto 8795; dejó datos de prueba en la D1 local), y capturas de `/`, `/pedido/<token>`, 404 y `/admin/ingresar`. Las herramientas de Chrome se colgaron a mitad de camino; las últimas capturas se sacaron con Edge sin ventana. Servidores locales cerrados.
+  - No publicado.
+- Pedido 22: auditoría de los cambios de los pedidos 19 a 21 y deploy.
+  - Revisado: `.logo` solo lo usa `LogoCapus`; en `/` la única ficha de estado es "Agotado" (`estado-cancelado`), por eso a `.con-fondo` no le hacen falta los tokens de nuevo/preparado/entregado; el `viewport` de la página se combina con el del layout por clave (Next combina por clave: `width=device-width, initial-scale=1` se mantiene); nada más usaba `LogoPizza` ni `.marca-nombre`. Sin errores. Riesgo anotado: los tokens oscuros repetidos en `.con-fondo`.
+  - `npm run deploy`: versión `33044aa9-e9ae-4e08-885a-a669eba4bf52`, 5 archivos nuevos (logo, fondo, og.png, CSS, BUILD_ID). Sin migraciones.
+  - Verificado en https://la-pizzeria.lavadito.workers.dev (la versión nueva tardó unos segundos en llegar): `/` 200 con `<main class="publico con-fondo">`, logo en el `<h1>`, `theme-color` `#0e0907`, `color-scheme` dark y viewport intacto; `logo-capus.webp` (47 KB), `fondo-capus.webp` (23 KB) y `og.png` (206 KB) 200; `og:image:alt` "Capu's"; `/no-existe` 404 con el logo; `/admin/ingresar` 200. No se corrió la prueba de humo contra lo publicado (no dejó datos de prueba).
+
+## Sesión 6: 2026-11-25/26
+- Pedidos 23 a 25: **aviso por mail al dueño cuando entra un pedido**, en la rama `feat/aviso-pedidos-mail` (sin mergear ni publicar el código).
+  - Antes: el dueño solo se enteraba con el admin abierto (se refresca cada 30 s) o si el cliente tocaba "Avisar por WhatsApp".
+  - Opciones gratis evaluadas: WhatsApp no tiene vía oficial gratis (la API de Meta cobra los mensajes que inicia el negocio); Telegram y push quedaron como alternativas; el usuario eligió **mail**. El mail de Cloudflare (Email Service) es gratis a direcciones verificadas pero exige un dominio con Email Routing en la cuenta, y no hay ninguno. Se fue con **Resend** (plan gratis: 3.000/mes, 100/día).
+  - La cuenta de Resend del usuario (abierta en Chrome) ya tenía verificado `nextstarting.com.ar` (otro proyecto). El usuario eligió mandar desde ahí, así se puede escribir a cualquier dirección (sin dominio, Resend solo deja escribirle al dueño de la cuenta).
+  - Código:
+    - `lib/mensajes.ts`: `mailPedidoNuevo` arma asunto (una línea: número, cliente, total, envío/retiro), texto y HTML (lo que escribe el cliente va escapado), con teléfono, link de WhatsApp y botón al admin. Pruebas en `tests/mail.test.ts`.
+    - `lib/aviso.ts` (nuevo, server-only): `avisarPorMail` hace el POST a la API de Resend con `Idempotency-Key: pedido-<token>`, 10 s de tope y sin tirar errores: si falla, solo queda en los logs del Worker. Si falta `RESEND_CLAVE` o `AVISO_MAIL`, no manda nada (así en local y en la prueba de humo no salen mails).
+    - `app/acciones.ts`: `crearPedido` toma el id del pedido del batch (`meta.last_row_id`) y agenda el mail con `after()` de Next, que corre después de responder. El cliente no espera al mail y un error del mail no toca el pedido.
+    - `lib/cloudflare.ts`: `Env` suma `RESEND_CLAVE`, `AVISO_MAIL` y `AVISO_REMITENTE` (opcionales). `AVISO_MAIL` acepta varios separados por coma.
+    - `wrangler.jsonc`: variable `AVISO_REMITENTE` = `Capu's pedidos <pedidos@nextstarting.com.ar>`. `.dev.vars.example` documenta las dos de local.
+  - Infraestructura:
+    - Resend: clave nueva `la-pizzeria-avisos`, permiso **solo de envío** y **restringida a `nextstarting.com.ar`**, creada desde Chrome. Su valor no pasó por la conversación: el usuario la copia y la carga.
+    - Worker: secreto `AVISO_MAIL` = `nehuenxtreem6@gmail.com` (para probar; después, el mail del cliente).
+    - **Falta** el secreto `RESEND_CLAVE` (lo carga el usuario) y publicar el código.
+  - Verificado: 55 pruebas, typecheck, build de OpenNext y prueba de humo completa en `wrangler dev` local (puerto 8794, cerrado al terminar; dejó datos de prueba en la D1 local). En el log del Worker local aparece "aviso por mail: sin RESEND_CLAVE…" por cada pedido: `after` corre en el Worker y no rompe la redirección. El envío real a Resend todavía no se probó.
+- Pedido 26: el usuario cargó `RESEND_CLAVE`; `wrangler secret list` muestra `ADMIN_CLAVE`, `AVISO_MAIL`, `RESEND_CLAVE` y `SESION_SECRETO`. Pestaña de Resend cerrada.
+- Pedido 27: prueba de punta a punta contra producción.
+  - `npm run deploy` desde la rama `feat/aviso-pedidos-mail` (sin mergear): versión `1c20bfe1-83aa-482c-9dc6-b7f1f256698e`, con `AVISO_REMITENTE` como variable.
+  - **La D1 publicada ya tiene uso real**: 4 productos "A la piedra!" (uno por sabor) con stock y 3 pedidos entregados. Para no tocar ese stock se creó un producto aparte ("Prueba aviso (no pedir)", id 5, stock 1, en Muzza) directo en la D1 y se hizo un solo pedido por la Server Action `crearPedido` (script descartable en el scratchpad; no se usó la prueba de humo porque manda un mail por pedido).
+  - Resultado: pedido #4 creado y redirigido; en Resend, "Pedido nuevo #4 · Prueba aviso · $ 100 · Envío" a `nehuenxtreem6@gmail.com`, estado **Delivered**.
+  - Limpieza: borrados el pedido #4 y sus ítems y el producto 5; `sqlite_sequence` de pedidos vuelto a 3 (el próximo pedido real es el #4). Verificado: quedan los 3 pedidos y los 4 productos originales con su stock, sin ítems huérfanos.
+  - Pendiente: que el usuario confirme si le llegó a la bandeja de entrada (o a spam) y cómo se ve.
+- Pedido 28: auditoría y pase a `main` y producción.
+  - Revisado: el id del pedido sale de `meta.last_row_id` del primer statement del batch (el INSERT); `after` corre en el Worker publicado (probado en el pedido 27); el HTML escapa todo lo que escribe el cliente; sin clave o destino no se manda nada; el pedido nunca depende del mail.
+  - Corregido: `crearPedido` leía los bindings dos veces (ahora una sola) y el ejemplo de `.dev.vars.example` tenía "ñ" en el mail.
+  - Riesgo anotado: el plan gratis de Resend tiene 100 mails por día. Si se pasa (por muchos pedidos o abuso desde muchas IP, ya que el límite es por IP), los avisos fallan en silencio (quedan en los logs) y los pedidos siguen entrando.
+  - Sin pruebas automáticas del envío en sí (`lib/aviso.ts` es server-only); se cubrió con la prueba real del pedido 27.
+  - Verificado: 55 pruebas, typecheck, build de OpenNext y prueba de humo completa en `wrangler dev` local (puerto 8796, cerrado al terminar).
