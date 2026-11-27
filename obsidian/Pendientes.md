@@ -24,7 +24,7 @@ Ver [[Bitácora]] → sesión 4.
 - [x] Código, pruebas y prueba de humo local.
 - [x] Clave de Resend `la-pizzeria-avisos` (solo envío, dominio `nextstarting.com.ar`) y secreto `AVISO_MAIL` en el Worker.
 - [x] Clave de Resend cargada como secreto `RESEND_CLAVE` (la cargó el usuario el 2026-11-26).
-- [x] Publicada desde la rama (versión `1c20bfe1`, 2026-11-27) y probada con un pedido: Resend lo entregó.
+- [x] Probada con un pedido (Resend lo entregó) y publicada desde `main` (versión `0b20c9db`, 2026-11-27).
 - [ ] El usuario confirma si llegó a la bandeja de entrada o a spam, y si hay que cambiar algo del mail.
 - [ ] Cuando se pase a producción real: cambiar el destino por el mail del cliente con `! npx wrangler secret put AVISO_MAIL` (no hace falta redeployar).
 - [ ] Si Capu's tiene dominio propio: verificarlo en Resend (o pasar al mail de Cloudflare) y cambiar `AVISO_REMITENTE` en `wrangler.jsonc`.

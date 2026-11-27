@@ -154,3 +154,5 @@ actualizado: 2026-11-23
   - Riesgo anotado: el plan gratis de Resend tiene 100 mails por día. Si se pasa (por muchos pedidos o abuso desde muchas IP, ya que el límite es por IP), los avisos fallan en silencio (quedan en los logs) y los pedidos siguen entrando.
   - Sin pruebas automáticas del envío en sí (`lib/aviso.ts` es server-only); se cubrió con la prueba real del pedido 27.
   - Verificado: 55 pruebas, typecheck, build de OpenNext y prueba de humo completa en `wrangler dev` local (puerto 8796, cerrado al terminar).
+  - Commits `57721d1` (logo y fondo, pedidos 19 a 22) y `984563d` (aviso por mail) en `feat/aviso-pedidos-mail`; `main` avanzado a `984563d` y los dos pusheados a `origin`. La imagen original de WhatsApp sigue sin versionar.
+  - `npm run deploy` desde `main`: versión `0b20c9db-62de-4224-a1d8-cd3fb0c79b8b`. Verificado: `/` 200, `/admin/ingresar` 200, `/no-existe` 404.
