@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
-import { LogoPizza } from "@/app/LogoPizza";
+import { LogoCapus } from "@/app/LogoCapus";
 import { ajustesActuales } from "@/lib/datos";
 import { haySesion } from "@/lib/sesion";
 import { ingresar } from "../acciones";
@@ -17,7 +17,7 @@ export default async function Ingresar() {
   return (
     <main className="admin ingresar">
       <div className="marca">
-        <LogoPizza />
+        <LogoCapus ancho={112} />
         <div>
           <h1>Admin</h1>
           <p className="ayuda">{ajustes.nombre_local}</p>

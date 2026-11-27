@@ -1,11 +1,14 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
 import { connection } from "next/server";
 import { db } from "@/lib/cloudflare";
 import { ajustesActuales, leerCatalogo } from "@/lib/datos";
 import { origenSitio } from "@/lib/formato";
-import { LogoPizza } from "./LogoPizza";
+import { LogoCapus } from "./LogoCapus";
 import { Pedir } from "./Pedir";
+
+// La página de pedidos es siempre oscura (fondo de logos): la barra del navegador, igual.
+export const viewport: Viewport = { colorScheme: "dark", themeColor: "#0e0907" };
 
 export async function generateMetadata(): Promise<Metadata> {
   await connection();
@@ -17,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title: a.nombre_local,
       description: "Mirá qué hay y hacé tu pedido.",
-      images: [{ url: "/og.png", width: 1200, height: 630, alt: "Pizzas" }],
+      images: [{ url: "/og.png", width: 1200, height: 630, alt: a.nombre_local }],
       locale: "es_AR",
       type: "website",
     },
@@ -32,12 +35,11 @@ export default async function Inicio() {
     .filter((s) => s.productos.length > 0);
 
   return (
-    <main className="publico">
-      <header className="cabecera">
-        <div className="marca">
-          <LogoPizza />
-          <h1>{ajustes.nombre_local}</h1>
-        </div>
+    <main className="publico con-fondo">
+      <header className="cabecera cabecera-logo">
+        <h1>
+          <LogoCapus ancho={260} alt={ajustes.nombre_local} prioridad />
+        </h1>
         <p className="bajada">Elegí cuántas querés, hacé tu pedido y coordinamos por WhatsApp.</p>
         {ajustes.texto_retiro && (
           <p className="retiro">

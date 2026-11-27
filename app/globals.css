@@ -583,19 +583,13 @@ form[data-sucio] .sin-guardar,
   text-decoration: none;
 }
 
-.marca h1,
-.marca-nombre {
+.marca h1 {
   margin: 0;
-}
-
-.marca-nombre {
-  font-family: var(--fuente-titulos);
-  font-weight: 600;
-  font-size: var(--texto-l);
 }
 
 .logo {
   flex: none;
+  display: block;
 }
 
 .nota {
@@ -663,6 +657,60 @@ form[data-sucio] .sin-guardar,
   padding: 0 16px;
 }
 
+/* Página de pedidos con el fondo de logos de Capu's (pedido 20): siempre oscura,
+   haya elegido el celular modo claro u oscuro. Repite los tokens del modo oscuro
+   (sección 2): si se cambia uno allá, cambiarlo también acá. */
+.con-fondo {
+  --fondo: #1c1310;
+  --superficie: #2a1e19;
+  --superficie-2: #33251f;
+  --tinta: #f7ebe1;
+  --suave: #bfa99b;
+  --linea: #43322a;
+  --borde-control: #8a7264;
+  --acento: #ff8a5c;
+  --acento-tinta: #2b0d05;
+  --acento-suave: #4a2116;
+  --acento-fuerte: #ffb89c;
+  --ok: #5cc489;
+  --peligro: #ff7b6e;
+  --peligro-tinta: #1c1310;
+  --peligro-suave: #4d1a15;
+  --peligro-texto: #ffb4ab;
+  --velo: rgb(28 19 16 / 80%);
+  --fondo-hoja: rgb(0 0 0 / 60%);
+  --cancelado-t: #d6cdc7;
+  --cancelado-f: #3a332f;
+  --cancelado-b: #8a7264;
+  --sombra: 0 1px 0 rgb(0 0 0 / 35%);
+  --sombra-alta: 0 8px 28px rgb(0 0 0 / 50%);
+
+  color-scheme: dark;
+  color: var(--tinta);
+}
+
+/* Logos detrás y una capa oscura encima, fijos al hacer scroll (sin
+   background-attachment: fixed, que en iPhone no anda). */
+.con-fondo::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(rgb(14 9 7 / 80%), rgb(14 9 7 / 80%)),
+    #000 url("/fondo-capus.webp") 0 0 / 413px auto repeat;
+}
+
+/* Lo que asoma al estirar la página más allá del borde, y las barras de scroll. */
+:root:has(.con-fondo) {
+  color-scheme: dark;
+  background: #0e0907;
+}
+
+:root:has(.con-fondo) body {
+  background: transparent;
+}
+
 .cabecera {
   margin: 0 -16px;
   padding: var(--e-6) 16px var(--e-3);
@@ -671,6 +719,22 @@ form[data-sucio] .sin-guardar,
 
 .cabecera h1 {
   font-size: var(--texto-3xl);
+}
+
+/* Cabecera de la página de pedidos: el logo de Capu's centrado, con el texto abajo. */
+.cabecera-logo {
+  text-align: center;
+}
+
+.cabecera-logo h1 {
+  margin: 0 0 var(--e-1);
+  line-height: 0;
+}
+
+.cabecera-logo .logo {
+  width: min(260px, 72vw);
+  height: auto;
+  margin-inline: auto;
 }
 
 .cabecera-chica {
